@@ -13,6 +13,7 @@ class Legion(Package):
     def install(self, spec, prefix):
         with working_dir('spack-build', create=True):
             cmake("..",
+                  "-DLegion_USE_GASNet=ON",
                   "-DCMAKE_EXE_LINKER_FLAGS=-lrt",
                   *std_cmake_args)
             make()
