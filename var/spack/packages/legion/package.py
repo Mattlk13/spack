@@ -5,16 +5,15 @@ class Legion(Package):
     homepage = "http://legion.stanford.edu"
     url      = "http://www.example.com/legion-1.0.tar.gz"
 
-    version('2014-11-13', git='https://github.com/StanfordLegion/legion.git',
-            commit='bf1ff0b71d9a3a74bcfbc5d9bb6d64bfc7ddb6a7')
+    version('2014-11-13', git='https://github.com/chuckatkins/legion.git',
+            commit='d1d89ea905e2bee7f148fb38ed0d2581fb10c023')
 
     depends_on('gasnet')
 
     def install(self, spec, prefix):
-        with working_dir('runtime'):
-            make('CONDUIT=udp',
-                 'GASNET=%s' % spec['gasnet'].prefix,
-                 'USE_CUDA=0',
-                 'USE_MPI=0')
-
-#            make("install")
+        with working_dir('spack-build', create=True):
+            cmake("..",
+                  "-DCMAKE_EXE_LINKER_FLAGS=-lrt",
+                  *std_cmake_args)
+            make()
+            make("install")
