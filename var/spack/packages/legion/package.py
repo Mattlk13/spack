@@ -5,7 +5,7 @@ class Legion(Package):
     homepage = "http://legion.stanford.edu"
     url      = "http://www.example.com/legion-1.0.tar.gz"
 
-    version('2014-11-13', git='https://github.com/chuckatkins/legion.git',
+    version('2014-12-08', git='https://github.com/chuckatkins/legion.git',
             commit='d1d89ea905e2bee7f148fb38ed0d2581fb10c023')
 
     depends_on('gasnet')
