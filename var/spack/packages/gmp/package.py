@@ -36,5 +36,15 @@ class Gmp(Package):
 
     def install(self, spec, prefix):
         configure("--prefix=%s" % prefix)
+                   
         make()
+        make("check")
+        make("install")
+
+    @when('=macosx_10.8_x86_64')
+    def install(self, spec, prefix):
+        configure("--prefix=%s" % prefix,"--with-pic")
+
+        make()
+        make("check")
         make("install")
