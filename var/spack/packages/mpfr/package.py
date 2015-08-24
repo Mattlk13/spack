@@ -36,6 +36,9 @@ class Mpfr(Package):
     depends_on('gmp')
 
     def install(self, spec, prefix):
-        configure("--prefix=%s" % prefix)
+        gmp = spec['gmp']
+        configure("--prefix=%s" % prefix,
+                  "--with-gmp=%s" % gmp.prefix)
+        
         make()
         make("install")
