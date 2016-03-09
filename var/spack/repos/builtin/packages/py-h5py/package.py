@@ -41,17 +41,17 @@ class PyH5py(Package):
     extends('python')
 
     # Build dependencies
-    depends_on('py-cython@0.19:')
-    depends_on('pkg-config')
+    depends_on('py-cython@0.19:', deptypes='build')
+    depends_on('pkg-config', deptypes='build')
     depends_on('hdf5@1.8.4:')
     depends_on('hdf5+mpi', when='+mpi')
     depends_on('mpi', when='+mpi')
 
     # Build and runtime dependencies
-    depends_on('py-numpy@1.6.1:')
+    depends_on('py-numpy@1.6.1:', deptypes=nolink)
 
     # Runtime dependencies
-    depends_on('py-six')
+    depends_on('py-six', deptypes=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'configure',

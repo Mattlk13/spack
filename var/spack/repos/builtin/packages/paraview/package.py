@@ -43,12 +43,13 @@ class Paraview(Package):
     variant('opengl2', default=False, description='Enable OpenGL2 backend')
 
     depends_on('python@2:2.7', when='+python')
-    depends_on('py-numpy', when='+python')
-    depends_on('py-matplotlib', when='+python')
+    depends_on('py-numpy', when='+python', deptypes='run')
+    depends_on('py-matplotlib', when='+python', deptypes='run')
     depends_on('tcl', when='+tcl')
     depends_on('mpi', when='+mpi')
     depends_on('qt@:4', when='+qt')
 
+    depends_on('cmake', deptypes='build')
     depends_on('bzip2')
     depends_on('freetype')
     #depends_on('hdf5+mpi', when='+mpi')

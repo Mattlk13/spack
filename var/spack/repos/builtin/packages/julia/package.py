@@ -44,16 +44,16 @@ class Julia(Package):
     patch('openblas.patch', when='@0.4:0.4.5')
 
     # Build-time dependencies:
-    # depends_on("awk")
-    # depends_on("m4")
-    # depends_on("pkg-config")
+    # depends_on("awk", deptypes='build')
+    # depends_on("m4", deptypes='build')
+    # depends_on("pkg-config", deptypes='build')
 
     # Combined build-time and run-time dependencies:
-    depends_on("binutils")
-    depends_on("cmake @2.8:")
-    depends_on("git")
-    depends_on("openssl")
-    depends_on("python @2.7:2.999")
+    depends_on("binutils", deptypes=nolink)
+    depends_on("cmake @2.8:", deptypes=nolink)
+    depends_on("git", deptypes=nolink)
+    depends_on("openssl", deptypes=nolink)
+    depends_on("python @2.7:2.999", deptypes=nolink)
 
     # I think that Julia requires the dependencies above, but it
     # builds fine (on my system) without these. We should enable them
@@ -93,8 +93,8 @@ class Julia(Package):
     # USE_SYSTEM_LIBGIT2=0
 
     # Run-time dependencies for Julia packages:
-    depends_on("hdf5")
-    depends_on("mpi")
+    depends_on("hdf5", deptypes='run')
+    depends_on("mpi", deptypes='run')
 
     def install(self, spec, prefix):
         # Explicitly setting CC, CXX, or FC breaks building libuv, one

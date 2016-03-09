@@ -35,12 +35,12 @@ class PyCsvkit(Package):
 
     extends('python')
 
-    depends_on('py-dateutil')
-    depends_on('py-dbf')
-    depends_on('py-xlrd')
-    depends_on('py-SQLAlchemy')
-    depends_on('py-six')
-    depends_on('py-openpyxl')
+    depends_on('py-dateutil', deptypes=nolink)
+    depends_on('py-dbf', deptypes=nolink)
+    depends_on('py-xlrd', deptypes=nolink)
+    depends_on('py-SQLAlchemy', deptypes=nolink)
+    depends_on('py-six', deptypes=nolink)
+    depends_on('py-openpyxl', deptypes=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--prefix=%s' % prefix)

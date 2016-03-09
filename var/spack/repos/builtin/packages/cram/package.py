@@ -33,6 +33,7 @@ class Cram(Package):
 
     extends('python')
     depends_on("mpi")
+    depends_on('cmake', deptypes='build')
 
     def install(self, spec, prefix):
         cmake(".", *std_cmake_args)

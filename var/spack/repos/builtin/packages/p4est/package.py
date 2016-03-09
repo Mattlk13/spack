@@ -34,9 +34,9 @@ class P4est(Package):
     variant('tests', default=True, description='Run small tests')
 
     # build dependencies
-    depends_on('automake')
-    depends_on('autoconf')
-    depends_on('libtool@2.4.2:')
+    depends_on('automake', deptypes='build')
+    depends_on('autoconf', deptypes='build')
+    depends_on('libtool@2.4.2:', deptypes='build')
 
     # other dependencies
     depends_on('lua') # Needed for the submodule sc

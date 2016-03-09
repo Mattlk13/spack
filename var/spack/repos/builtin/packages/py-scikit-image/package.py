@@ -36,12 +36,12 @@ class PyScikitImage(Package):
 
     extends('python', ignore=r'bin/.*\.py$')
 
-    depends_on('py-dask')
-    depends_on('pil')
-    depends_on('py-networkx')
-    depends_on('py-six')
-    depends_on('py-scipy')
-    depends_on('py-matplotlib')
+    depends_on('py-dask', deptypes=nolink)
+    depends_on('pil', deptypes=nolink)
+    depends_on('py-networkx', deptypes=nolink)
+    depends_on('py-six', deptypes=nolink)
+    depends_on('py-scipy', deptypes=nolink)
+    depends_on('py-matplotlib', deptypes=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--prefix=%s' % prefix)
