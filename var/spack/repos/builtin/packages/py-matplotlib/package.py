@@ -38,6 +38,7 @@ class PyMatplotlib(Package):
 
     extends('python', ignore=r'bin/nosetests.*$|bin/pbr$')
 
+    depends_on('py-setuptools', deptypes='build')
     depends_on('py-pyside', when='+gui', deptypes=nolink)
     depends_on('py-ipython', when='+ipython', deptypes=nolink)
     depends_on('py-pyparsing', deptypes=nolink)
