@@ -824,24 +824,27 @@ class Package(object):
         return resource_stage_folder
 
 
-    def do_install(self,
-                   keep_prefix=False,  keep_stage=False, ignore_deps=False,
-                   skip_patch=False, verbose=False, make_jobs=None, fake=False):
+    def do_install(self, keep_prefix=False,  keep_stage=False, ignore_deps=False,
+                   skip_patch=False, verbose=False, make_jobs=None, fake=False,
+                   install_function=None):
         """Called by commands to install a package and its dependencies.
 
         Package implementations should override install() to describe
         their build process.
 
         Args:
-        keep_prefix -- Keep install prefix on failure. By default, destroys it.
-        keep_stage  -- By default, stage is destroyed only if there are no
-                       exceptions during build. Set to True to keep the stage
-                       even with exceptions.
-        ignore_deps -- Do not install dependencies before installing this package.
-        fake        -- Don't really build -- install fake stub files instead.
-        skip_patch  -- Skip patch stage of build if True.
-        verbose     -- Display verbose build output (by default, suppresses it)
-        make_jobs   -- Number of make jobs to use for install.  Default is ncpus.
+        keep_prefix      -- Keep install prefix on failure. By default, destroys it.
+        keep_stage       -- By default, stage is destroyed only if there are no
+                            exceptions during build. Set to True to keep the stage
+                            even with exceptions.
+        ignore_deps      -- Do not install dependencies before installing this package.
+        fake             -- Don't really build -- install fake stub files instead.
+        skip_patch       -- Skip patch stage of build if True.
+        verbose          -- Display verbose build output (by default, suppresses it)
+        make_jobs        -- Number of make jobs to use for install.  Default is ncpus.
+        install_function -- Optionally override the function called to do the install.
+                            This allows commands to hijack the install function and do
+                            something special instead. By default, use `self.install`.
         """
         if not self.spec.concrete:
             raise ValueError("Can only install concrete packages.")
@@ -855,6 +858,10 @@ class Package(object):
         if spack.install_layout.check_installed(self.spec):
             tty.msg("%s is already installed in %s" % (self.name, self.prefix))
             return
+
+        # Allo user to override the install function.
+        if install_function is None:
+            install_function = self.install
 
         tty.msg("Installing %s" % self.name)
 
@@ -901,7 +908,7 @@ class Package(object):
                         log_file = open(log_path, 'w')
                         with log_output(log_file, verbose, sys.stdout.isatty(), True):
                             dump_environment(env_path)
-                            self.install(self.spec, self.prefix)
+                            install_function(self.spec, self.prefix)
 
                      except ProcessError as e:
                          # Annotate ProcessErrors with the location of the build log.
