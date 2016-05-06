@@ -1815,7 +1815,7 @@ class Spec(object):
         return colorize_spec(self)
 
 
-    def format(self, format_string='$_$@$%@+$+$=', **kwargs):
+    def format(self, format_string='$_$@$%@+$+$=$#', **kwargs):
         """Prints out particular pieces of a spec, depending on what is
            in the format string.  The format strings you can provide are::
 
