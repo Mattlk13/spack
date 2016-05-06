@@ -861,7 +861,8 @@ class Package(object):
             return
 
         # Ensure package is not already installed
-        if spack.install_layout.check_installed(self.spec):
+#        if spack.install_layout.check_installed(self.spec):
+        if spack.installed_db.query(self.spec):
             tty.msg("%s is already installed in %s" % (self.name, self.prefix))
             return
 

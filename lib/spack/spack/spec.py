@@ -755,7 +755,6 @@ class Spec(object):
         """
         Return a hash of the entire spec DAG, including connectivity.
         """
-        print self, "++"
         if getattr(self, 'hash', None):
             return self.hash
         else:
@@ -769,8 +768,7 @@ class Spec(object):
 
     def to_node_dict(self):
         params = dict( (name, v.value) for name, v in self.variants.items() )
-        params.update( dict( (name, []) for name in FlagMap.valid_compiler_flags() ) )
-        params.update( dict( (name, value) for name, value in self.compiler_flags.items()) ) #override
+        params.update( dict( (name, value) for name, value in self.compiler_flags.items()) )
         d = {
             'parameters' : params,
             'arch' : self.architecture,
@@ -1741,7 +1739,8 @@ class Spec(object):
             visited_o = id(o) in vo
 
             # Check for duplicate or non-equal dependencies
-            if visited_s != visited_o: return False
+            if visited_s != visited_o:
+                return False
 
             # Skip visited nodes
             if visited_s or visited_o: continue
@@ -2125,8 +2124,6 @@ class SpecParser(spack.parse.Parser):
 
         if spec_name != '':
             self.check_identifier(spec_name)
-
-        print spec_name, "++"
 
         # This will init the spec without calling __init__.
         spec = Spec.__new__(Spec)
