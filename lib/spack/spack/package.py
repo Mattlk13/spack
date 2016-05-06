@@ -852,6 +852,8 @@ class Package(object):
         verbose     -- Display verbose build output (by default, suppresses it)
         make_jobs   -- Number of make jobs to use for install.  Default is ncpus.
         """
+        print self.spec
+
         if not self.spec.concrete:
             raise ValueError("Can only install concrete packages.")
 
