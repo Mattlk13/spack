@@ -936,6 +936,15 @@ class Spec(object):
             del self.dependencies[dep.name]
 
 
+    def _replace_dag(self, replacement):
+        """Replace this spec and subdag with another.
+
+        Connects all dependents of this spec to its replacement.
+        """
+        for name, dependent in self.dependents.items():
+            del dependent.dependencies[self.name]
+            dependent._add_dependency(replacement)
+
     def _expand_virtual_packages(self):
         """Find virtual packages in this spec, replace them with providers,
            and normalize again to include the provider's (potentially virtual)
@@ -1070,9 +1079,15 @@ class Spec(object):
             if s.namespace is None:
                 s.namespace = spack.repo.repo_for_pkg(s.name).namespace
 
+        # Replace dependencies with existing versions if existing
+        # spec satisfies dependency.
+        for s in self.traverse(order='post', cover='nodes', root=False):
+            satisfiers = spack.installed_db.query(s, installed=True)
+            if satisfiers:
+                s._replace_dag(satisfiers[0])
+
         # Mark everything in the spec as concrete, as well.
         self._mark_concrete()
-
 
     def _mark_concrete(self):
         """Mark this spec and its dependencies as concrete.
@@ -1083,7 +1098,6 @@ class Spec(object):
         for s in self.traverse():
             s._normal = True
             s._concrete = True
-
 
     def concretized(self):
         """This is a non-destructive version of concretize().  First clones,
