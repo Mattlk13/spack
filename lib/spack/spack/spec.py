@@ -1081,11 +1081,13 @@ class Spec(object):
 
         # Replace dependencies with existing versions if existing
         # spec satisfies dependency.
+        print self, self.dag_hash()
         for s in self.traverse(order='post', cover='nodes', root=False):
             satisfiers = spack.installed_db.query(s, installed=True)
             if satisfiers:
+                print "replacing", s, 'with', satisfiers[0]
                 s._replace_dag(satisfiers[0])
-
+        print self, self.dag_hash()
         # Mark everything in the spec as concrete, as well.
         self._mark_concrete()
 
