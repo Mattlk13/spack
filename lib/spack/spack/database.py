@@ -512,7 +512,7 @@ class Database(object):
             # skips unknown packages
             # TODO: conditional way to do this instead of catching exceptions
 
-    def query(self, query_spec=any, known=any, installed=True, explicit=any):
+    def query(self, query_spec=any, known=any, installed=True, explicit=any, reverse_flags=False):
         """Run a query on the database.
 
         ``query_spec``
@@ -557,19 +557,19 @@ class Database(object):
                 if known is not any and spack.repo.exists(
                         rec.spec.name) != known:
                     continue
-                if query_spec is any or rec.spec.satisfies(query_spec):
+                if query_spec is any or rec.spec.satisfies(query_spec, reverse_flags=reverse_flags):
                     results.append(rec.spec)
 
             return sorted(results)
 
-    def query_one(self, query_spec, known=any, installed=True):
+    def query_one(self, query_spec, known=any, installed=True, reverse_flags=False):
         """Query for exactly one spec that matches the query spec.
 
         Raises an assertion error if more than one spec matches the
         query. Returns None if no installed package matches.
 
         """
-        concrete_specs = self.query(query_spec, known, installed)
+        concrete_specs = self.query(query_spec, known, installed, reverse_flags)
         assert len(concrete_specs) <= 1
         return concrete_specs[0] if concrete_specs else None
 

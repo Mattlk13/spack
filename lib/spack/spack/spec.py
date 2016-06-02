@@ -373,7 +373,14 @@ class FlagMap(HashableMap):
         super(FlagMap, self).__init__()
         self.spec = spec
 
-    def satisfies(self, other, strict=False):
+    def satisfies(self, other, strict=False, reverse=False):
+        test = other.copy()
+        for f in _valid_compiler_flags:
+            if f not in test:
+                test[f] = []
+        return test._satisfies(self, True) if reverse else self._satisfies(other, strict)
+
+    def _satisfies(self, other, strict=False):
         if strict or (self.spec and self.spec._concrete):
             return all(f in self and set(self[f]) <= set(other[f])
                        for f in other)
@@ -1468,7 +1475,7 @@ class Spec(object):
         except SpecError:
             return parse_anonymous_spec(spec_like, self.name)
 
-    def satisfies(self, other, deps=True, strict=False):
+    def satisfies(self, other, deps=True, strict=False, reverse_flags=False):
         """Determine if this spec satisfies all constraints of another.
 
         There are two senses for satisfies:
@@ -1531,7 +1538,9 @@ class Spec(object):
 
         if not self.compiler_flags.satisfies(
                 other.compiler_flags,
-                strict=strict):
+                strict=strict,
+                reverse=reverse_flags):
+
             return False
 
         # If we need to descend into dependencies, do it, otherwise we're done.
@@ -2028,44 +2037,44 @@ class SpecParser(spack.parse.Parser):
         specs = []
 
         try:
-            while self.next:
-                # TODO: clean this parsing up a bit
+            while self.next or self.previous:
                 if self.previous:
+                    # The previous spec grabbed the head of this one
                     specs.append(self.spec(self.previous.value))
+                    self.previous = None
+                    continue
+
                 if self.accept(ID):
-                    self.previous = self.token
+                    parameter = self.token.value
                     if self.accept(EQ):
-                        if not specs:
-                            specs.append(self.spec(None))
+                        # Anonymous spec starting with <parameter>=
                         if self.accept(QT):
                             self.token.value = self.token.value[1:-1]
                         else:
                             self.expect(ID)
-                        specs[-1]._add_flag(
-                            self.previous.value, self.token.value)
+                        value = self.token.value
+                        if not specs:
+                            specs.append(self.spec(None))
+                        specs[-1]._add_flag(parameter, value)
                     else:
-                        specs.append(self.spec(self.previous.value))
-                    self.previous = None
+                        # Just a normal spec
+                        specs.append(self.spec(self.token.value))
+
                 elif self.accept(HASH):
                     specs.append(self.spec_by_hash())
 
                 elif self.accept(DEP):
-                    if not specs:
-                        self.previous = self.token
-                        specs.append(self.spec(None))
-                        self.previous = None
                     if self.accept(HASH):
-                        specs[-1]._add_dependency(self.spec_by_hash())
+                        dep = self.spec_by_hash()
                     else:
                         self.expect(ID)
-                        specs[-1]._add_dependency(self.spec(self.token.value))
+                        dep = self.spec(self.token.value)
+                    if not specs:
+                        specs.append(self.spec(None))
+                    specs[-1]._add_dependency(dep)
 
                 else:
-                    # Attempt to construct an anonymous spec, but check that
-                    # the first token is valid
-                    # TODO: Is this check even necessary, or will it all be Lex
-                    # errors now?
-                    specs.append(self.spec(None, True))
+                    specs.append(self.spec(None))
 
         except spack.parse.ParseError, e:
             raise SpecParseError(e)
@@ -2094,7 +2103,7 @@ class SpecParser(spack.parse.Parser):
 
         return matches[0]
 
-    def spec(self, name, check_valid_token=False):
+    def spec(self, name):
         """Parse a spec out of the input.  If a spec is supplied, then initialize
            and return it instead of creating a new one."""
         if name:
@@ -2127,35 +2136,21 @@ class SpecParser(spack.parse.Parser):
         # unspecified or not.
         added_version = False
 
-        if self.previous and self.previous.value == DEP:
-            if self.accept(HASH):
-                spec.add_dependency(self.spec_by_hash())
-            else:
-                self.expect(ID)
-                if self.accept(EQ):
-                    raise SpecParseError(spack.parse.ParseError(
-                        "", "", "Expected dependency received anonymous spec"))
-                spec.add_dependency(self.spec(self.token.value))
-
         while self.next:
             if self.accept(AT):
                 vlist = self.version_list()
                 for version in vlist:
                     spec._add_version(version)
                 added_version = True
-                check_valid_token = False
 
             elif self.accept(ON):
                 spec._add_variant(self.variant(), True)
-                check_valid_token = False
 
             elif self.accept(OFF):
                 spec._add_variant(self.variant(), False)
-                check_valid_token = False
 
             elif self.accept(PCT):
                 spec._set_compiler(self.compiler())
-                check_valid_token = False
 
             elif self.accept(ID):
                 self.previous = self.token
@@ -2170,9 +2165,7 @@ class SpecParser(spack.parse.Parser):
                     return spec
 
             else:
-                if check_valid_token:
-                    self.unexpected_token()
-                break
+                self.unexpected_token()
 
         # If there was no version in the spec, consier it an open range
         if not added_version:

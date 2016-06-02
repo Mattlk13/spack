@@ -199,7 +199,7 @@ def query_arguments(args):
         explicit = True
     if args.implicit:
         explicit = False
-    q_args = {'installed': installed, 'known': known, "explicit": explicit}
+    q_args = {'installed': installed, 'known': known, "explicit": explicit, "reverse_flags": True}
     return q_args
 
 
