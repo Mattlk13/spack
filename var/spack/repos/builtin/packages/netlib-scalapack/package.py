@@ -44,7 +44,7 @@ class NetlibScalapack(Package):
 
     depends_on('mpi')
     depends_on('lapack')
-    depends_on('cmake', when='@2.0.0:', deptypes='build')
+    depends_on('cmake', when='@2.0.0:', type='build')
 
     def install(self, spec, prefix):
         options = [

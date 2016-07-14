@@ -41,7 +41,7 @@ class Mitos(Package):
     depends_on('dyninst@8.2.1:')
     depends_on('hwloc')
     depends_on('mpi')
-    depends_on('cmake', deptypes='build')
+    depends_on('cmake', type='build')
 
     def install(self, spec, prefix):
         with working_dir('spack-build', create=True):

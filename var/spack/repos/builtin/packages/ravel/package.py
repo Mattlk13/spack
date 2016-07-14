@@ -33,7 +33,7 @@ class Ravel(Package):
 
     version('1.0.0', 'b25fece58331c2adfcce76c5036485c2')
 
-    depends_on('cmake@2.8.9:', deptypes='build')
+    depends_on('cmake@2.8.9:', type='build')
 
     depends_on('muster@1.0.1:')
     depends_on('otf')

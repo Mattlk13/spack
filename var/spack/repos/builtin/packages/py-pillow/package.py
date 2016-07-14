@@ -62,8 +62,8 @@ class PyPillow(Package):
 
     # Required dependencies
     extends('python')
-    depends_on('binutils', deptypes='build')
-    depends_on('py-setuptools', deptypes='build')
+    depends_on('binutils', type='build')
+    depends_on('py-setuptools', type='build')
 
     # Recommended dependencies
     depends_on('jpeg', when='+jpeg')

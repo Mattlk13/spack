@@ -54,8 +54,8 @@ class Opencv(Package):
     depends_on('python')
     depends_on('py-numpy')
 
-    depends_on('eigen', when='+eigen', deptypes='build')
-    depends_on('cmake', deptypes='build')
+    depends_on('eigen', when='+eigen', type='build')
+    depends_on('cmake', type='build')
 
     # FIXME : GUI extensions missing
     # FIXME : CUDA extensions still missing

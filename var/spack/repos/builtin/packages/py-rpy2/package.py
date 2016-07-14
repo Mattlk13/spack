@@ -33,7 +33,7 @@ class PyRpy2(Package):
     version('2.5.6', 'a36e758b633ce6aec6a5f450bfee980f')
 
     extends('python')
-    depends_on('py-setuptools', deptypes='build')
+    depends_on('py-setuptools', type='build')
 
     depends_on('R')
 

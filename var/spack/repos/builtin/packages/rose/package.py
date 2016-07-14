@@ -40,9 +40,9 @@ class Rose(Package):
 
     patch('add_spack_compiler_recognition.patch')
 
-    depends_on("autoconf@2.69", deptypes='build')
-    depends_on("automake@1.14", deptypes='build')
-    depends_on("libtool@2.4", deptypes='build')
+    depends_on("autoconf@2.69", type='build')
+    depends_on("automake@1.14", type='build')
+    depends_on("libtool@2.4", type='build')
     depends_on("boost@1.54.0")
     depends_on("jdk@8u25-linux-x64")
 

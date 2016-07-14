@@ -44,7 +44,7 @@ class Exodusii(Package):
 
     version('2016-02-08', git='https://github.com/gsjaardema/seacas.git', commit='dcf3529')
 
-    depends_on('cmake@2.8.7:', deptypes='build')
+    depends_on('cmake@2.8.7:', type='build')
     depends_on('hdf5~shared~mpi')
     depends_on('netcdf~mpi')
 

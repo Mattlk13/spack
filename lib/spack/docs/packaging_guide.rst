@@ -1290,9 +1290,9 @@ Additionally, dependencies may be specified for specific use cases:
 
 .. code-block:: python
 
-    depends_on("cmake", deptypes="build")
-    depends_on("libelf", deptypes=("build", "link"))
-    depends_on("python", deptypes="run")
+    depends_on("cmake", type="build")
+    depends_on("libelf", type=("build", "link"))
+    depends_on("python", type="run")
 
 The dependency types are:
 
@@ -1305,7 +1305,7 @@ The dependency types are:
   * **"run"**: the project is used by the project at runtime. The package will
     be added to ``PATH`` and ``PYTHONPATH``.
 
-If not specified, ``deptypes`` is assumed to be ``("build", "link")``. This is
+If not specified, ``type`` is assumed to be ``("build", "link")``. This is
 the common case for compiled language usage. Also available are the aliases
 ``alldeps`` for all dependency types and ``nolink`` (``("build", "run")``) for
 use by dependencies which are not expressed via a linker (e.g., Python or Lua

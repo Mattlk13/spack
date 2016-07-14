@@ -10,7 +10,7 @@ class Dtrun1(Package):
     version('1.0', '0123456789abcdef0123456789abcdef')
 
     depends_on('dtlink5')
-    depends_on('dtrun3', deptypes='run')
+    depends_on('dtrun3', type='run')
 
     def install(self, spec, prefix):
         pass

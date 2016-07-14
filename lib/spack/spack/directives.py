@@ -211,9 +211,9 @@ def _depends_on(pkg, spec, when=None, deptypes=None):
 
 
 @directive(('dependencies', '_deptypes'))
-def depends_on(pkg, spec, when=None, deptypes=None):
+def depends_on(pkg, spec, when=None, type=None):
     """Creates a dict of deps with specs defining when they apply."""
-    _depends_on(pkg, spec, when=when, deptypes=deptypes)
+    _depends_on(pkg, spec, when=when, deptypes=type)
 
 
 @directive(('extendees', 'dependencies', '_deptypes'))

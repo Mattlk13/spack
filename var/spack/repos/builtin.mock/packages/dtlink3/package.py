@@ -9,7 +9,7 @@ class Dtlink3(Package):
 
     version('1.0', '0123456789abcdef0123456789abcdef')
 
-    depends_on('dtbuild2', deptypes='build')
+    depends_on('dtbuild2', type='build')
     depends_on('dtlink4')
 
     def install(self, spec, prefix):

@@ -44,7 +44,7 @@ class PyProtobuf(Package):
 
     extends('python')
 
-    depends_on('py-setuptools', deptypes='build')
+    depends_on('py-setuptools', type='build')
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--prefix={0}'.format(prefix))

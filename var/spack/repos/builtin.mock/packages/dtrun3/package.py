@@ -9,7 +9,7 @@ class Dtrun3(Package):
 
     version('1.0', '0123456789abcdef0123456789abcdef')
 
-    depends_on('dtbuild3', deptypes='build')
+    depends_on('dtbuild3', type='build')
 
     def install(self, spec, prefix):
         pass

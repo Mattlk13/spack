@@ -37,7 +37,7 @@ class Gflags(Package):
 
     version('2.1.2', 'ac432de923f9de1e9780b5254884599f')
 
-    depends_on('cmake', deptypes='build')
+    depends_on('cmake', type='build')
 
     def install(self, spec, prefix):
         cmake("-DCMAKE_INSTALL_PREFIX=" + prefix,

@@ -9,9 +9,9 @@ class Dttop(Package):
 
     version('1.0', '0123456789abcdef0123456789abcdef')
 
-    depends_on('dtbuild1', deptypes='build')
+    depends_on('dtbuild1', type='build')
     depends_on('dtlink1')
-    depends_on('dtrun1', deptypes='run')
+    depends_on('dtrun1', type='run')
 
     def install(self, spec, prefix):
         pass

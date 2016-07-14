@@ -43,8 +43,8 @@ class PyJinja2(Package):
     version('2.7', 'ec70433f325051dcedacbb2465028a35')
 
     extends("python")
-    depends_on("py-setuptools", deptypes='build')
-    depends_on("py-markupsafe", deptypes=nolink)
+    depends_on("py-setuptools", type='build')
+    depends_on("py-markupsafe", type=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--prefix=%s' % prefix)

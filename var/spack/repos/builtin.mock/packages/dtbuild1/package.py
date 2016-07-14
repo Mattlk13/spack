@@ -10,9 +10,9 @@ class Dtbuild1(Package):
 
     version('1.0', '0123456789abcdef0123456789abcdef')
 
-    depends_on('dtbuild2', deptypes='build')
+    depends_on('dtbuild2', type='build')
     depends_on('dtlink2')
-    depends_on('dtrun2', deptypes='run')
+    depends_on('dtrun2', type='run')
 
     def install(self, spec, prefix):
         pass

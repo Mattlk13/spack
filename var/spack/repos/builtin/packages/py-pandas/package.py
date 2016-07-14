@@ -35,12 +35,12 @@ class PyPandas(Package):
     version('0.18.0', 'f143762cd7a59815e348adf4308d2cf6')
 
     extends('python')
-    depends_on('py-dateutil', deptypes=nolink)
-    depends_on('py-numpy', deptypes=nolink)
-    depends_on('py-setuptools', deptypes='build')
-    depends_on('py-pytz', deptypes=nolink)
-    depends_on('py-numexpr', deptypes=nolink)
-    depends_on('py-bottleneck', deptypes=nolink)
+    depends_on('py-dateutil', type=nolink)
+    depends_on('py-numpy', type=nolink)
+    depends_on('py-setuptools', type='build')
+    depends_on('py-pytz', type=nolink)
+    depends_on('py-numexpr', type=nolink)
+    depends_on('py-bottleneck', type=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--prefix=%s' % prefix)

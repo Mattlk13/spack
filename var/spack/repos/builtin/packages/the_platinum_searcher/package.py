@@ -12,7 +12,7 @@ class ThePlatinumSearcher(Package):
 
     version('head', go=package)
 
-    extends("go", deptypes='build')
+    extends("go", type='build')
 
     def install(self, spec, prefix):
         env = os.environ

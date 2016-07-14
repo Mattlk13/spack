@@ -34,8 +34,8 @@ class PyLogilabCommon(Package):
     version('1.2.0', 'f7b51351b7bfe052746fa04c03253c0b')
 
     extends("python")
-    depends_on("py-setuptools", deptypes='build')
-    depends_on("py-six", deptypes=nolink)
+    depends_on("py-setuptools", type='build')
+    depends_on("py-six", type=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--prefix=%s' % prefix)

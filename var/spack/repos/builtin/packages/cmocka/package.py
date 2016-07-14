@@ -32,7 +32,7 @@ class Cmocka(Package):
     version('1.0.1', 'ed861e501a21a92b2af63e466df2015e')
     parallel = False
 
-    depends_on('cmake', deptypes='build')
+    depends_on('cmake', type='build')
 
     def install(self, spec, prefix):
         with working_dir('spack-build', create=True):

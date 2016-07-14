@@ -36,7 +36,7 @@ class Glm(Package):
 
     version('0.9.7.1', '61af6639cdf652d1cdd7117190afced8')
 
-    depends_on('cmake', deptypes='build')
+    depends_on('cmake', type='build')
 
     def install(self, spec, prefix):
         with working_dir('spack-build', create=True):

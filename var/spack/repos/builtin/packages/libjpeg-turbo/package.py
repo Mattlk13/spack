@@ -35,8 +35,8 @@ class LibjpegTurbo(Package):
     version('1.3.1', '2c3a68129dac443a72815ff5bb374b05')
 
     # Can use either of these.
-    depends_on("yasm", deptypes='build')
-    depends_on("nasm", deptypes='build')
+    depends_on("yasm", type='build')
+    depends_on("nasm", type='build')
 
     def install(self, spec, prefix):
         configure("--prefix=%s" % prefix)

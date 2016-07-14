@@ -32,10 +32,10 @@ class PyPyside(Package):
 
     version('1.2.2', 'c45bc400c8a86d6b35f34c29e379e44d')
 
-    depends_on('cmake', deptypes='build')
+    depends_on('cmake', type='build')
 
     extends('python')
-    depends_on('py-setuptools', deptypes='build')
+    depends_on('py-setuptools', type='build')
     depends_on('qt@:4')
 
     def patch(self):

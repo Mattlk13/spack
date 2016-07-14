@@ -31,9 +31,9 @@ class Libuv(Package):
 
     version('1.9.0', '14737f9c76123a19a290dabb7d1cd04c')
 
-    depends_on('automake', deptypes='build')
-    depends_on('autoconf', deptypes='build')
-    depends_on('libtool', deptypes='build')
+    depends_on('automake', type='build')
+    depends_on('autoconf', type='build')
+    depends_on('libtool', type='build')
 
     def install(self, spec, prefix):
         bash = which("bash")
