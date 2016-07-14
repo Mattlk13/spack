@@ -34,8 +34,8 @@ class PyRestview(Package):
     version('2.6.1', 'ac8b70e15b8f1732d1733d674813666b')
 
     extends('python')
-    depends_on('py-docutils')
-    depends_on('py-pygments')
+    depends_on('py-docutils', deptypes=nolink)
+    depends_on('py-pygments', deptypes=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--prefix={0}'.format(prefix))

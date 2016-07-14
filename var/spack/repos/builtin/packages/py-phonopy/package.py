@@ -33,10 +33,10 @@ class PyPhonopy(Package):
     version('1.10.0', '973ed1bcea46e21b9bf747aab9061ff6')
 
     extends('python')
-    depends_on('py-numpy')
-    depends_on('py-scipy')
-    depends_on('py-matplotlib')
-    depends_on('py-pyyaml')
+    depends_on('py-numpy', deptypes=nolink)
+    depends_on('py-scipy', deptypes=nolink)
+    depends_on('py-matplotlib', deptypes=nolink)
+    depends_on('py-pyyaml', deptypes=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--home=%s' % prefix)

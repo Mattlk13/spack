@@ -48,13 +48,13 @@ class Paradiseo(Package):
     variant('gnuplot',  default=False, description='Enable GnuPlot support')
     
     # Required dependencies
-    depends_on ("cmake")
+    depends_on ("cmake", deptypes='build')
 
     # Optional dependencies
     depends_on ("mpi", when="+mpi")
-    depends_on ("doxygen", when='+doc')
+    depends_on ("doxygen", when='+doc', deptypes='build')
     depends_on ("gnuplot", when='+gnuplot')
-    depends_on ("eigen", when='+edo')
+    depends_on ("eigen", when='+edo', deptypes='build')
     depends_on ("boost~mpi", when='+edo~mpi')
     depends_on ("boost+mpi", when='+edo+mpi')
 

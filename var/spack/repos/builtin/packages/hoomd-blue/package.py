@@ -45,12 +45,12 @@ class HoomdBlue(Package):
     variant('doc',  default=True, description='Generate documentation')
 
     extends('python')
-    depends_on('py-numpy')
+    depends_on('py-numpy', deptypes=nolink)
     depends_on('boost+python')
-    depends_on('cmake')
+    depends_on('cmake', deptypes='build')
     depends_on('mpi', when='+mpi')
     depends_on('cuda', when='+cuda')
-    depends_on('doxygen', when='+doc')
+    depends_on('doxygen', when='+doc', deptypes='build')
 
     def install(self, spec, prefix):
 

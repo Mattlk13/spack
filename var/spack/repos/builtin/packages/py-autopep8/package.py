@@ -8,8 +8,8 @@ class PyAutopep8(Package):
     version('1.2.2', 'def3d023fc9dfd1b7113602e965ad8e1')
 
     extends('python')
-    depends_on('py-setuptools')
-    depends_on('py-pep8')
+    depends_on('py-setuptools', deptypes='build')
+    depends_on('py-pep8', deptypes=nolink)
 
     def install(self, spec, prefix):
         python('setup.py', 'install', '--prefix=%s' % prefix)

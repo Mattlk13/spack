@@ -45,8 +45,8 @@ class Flux(Package):
     depends_on("py-cffi")
 
     # TODO: This provides a catalog, hacked with environment below for now
-    depends_on("docbook-xml")
-    depends_on("asciidoc")
+    depends_on("docbook-xml", deptypes='build')
+    depends_on("asciidoc", deptypes='build')
 
     def install(self, spec, prefix):
         # Bootstrap with autotools

@@ -40,6 +40,7 @@ class Cleverleaf(Package):
     depends_on("SAMRAI@3.8.0:")
     depends_on("hdf5+mpi")
     depends_on("boost")
+    depends_on('cmake', deptypes='build')
 
     def install(self, spec, prefix):
         cmake(*std_cmake_args)
