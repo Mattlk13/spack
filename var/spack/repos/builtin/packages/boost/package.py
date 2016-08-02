@@ -133,11 +133,15 @@ class Boost(Package):
 
     def determine_toolset(self, spec):
         if spec.satisfies("platform=darwin"):
-            return 'darwin'
+            if 'icpc' in self.compiler.cxx_names:
+                return 'intel-darwin'
+            else:
+                return 'darwin'
 
         toolsets = {'g++': 'gcc',
-                    'icpc': 'intel',
-                    'clang++': 'clang'}
+                    'icpc': 'intel-linux',
+                    'clang++': 'clang',
+                    'pgi++': 'pgi'}
 
         for cc, toolset in toolsets.iteritems():
             if cc in self.compiler.cxx_names:
