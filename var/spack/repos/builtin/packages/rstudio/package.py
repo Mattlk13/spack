@@ -44,10 +44,16 @@ class Rstudio(Package):
     # Concrete dependencies
     depends_on('R')
     depends_on('boost')
-    depends_on('qt@4.8.6')
+    depends_on('qt@5.4.0')
     
     def install(self, spec, prefix):
-        configure(*configure_args)
-        make()
-        make('install')
+        with working_dir('spack-build', create=True):
+            cmake_args = [
+                '..',
+                '-DRSTUDIO_TARGET=Desktop',
+                '-DCMAKE_BUILD_TYPE=Release',
+            ]
+            cmake(*cmake_args)
+            make()
+            make('install')
 
