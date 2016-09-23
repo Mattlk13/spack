@@ -36,7 +36,7 @@ class M4(AutotoolsPackage):
 
     patch('gnulib-pgi.patch', when='@1.4.18')
     patch('pgi.patch', when='@1.4.17')
-    patch('sched_macos.patch', when='@1.4.17')
+    patch('sched_macos2.patch', when='@1.4.17')
 
     variant('sigsegv', default=True,
             description="Build the libsigsegv dependency")
