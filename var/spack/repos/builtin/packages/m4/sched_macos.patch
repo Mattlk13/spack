@@ -1,0 +1,34 @@
+diff --git a/m4/sched_h.m4 b/m4/sched_h.m4
+index 931358f..d62bc9b 100644
+--- a/m4/sched_h.m4
++++ b/m4/sched_h.m4
+@@ -10,6 +10,7 @@ AC_DEFUN([gl_SCHED_H],
+ [
+   AC_COMPILE_IFELSE(
+     [AC_LANG_PROGRAM([[
++       #include <errno.h>
+        #include <sched.h>
+        struct sched_param a;
+        int b[] = { SCHED_FIFO, SCHED_RR, SCHED_OTHER };
+@@ -29,7 +30,8 @@ AC_DEFUN([gl_SCHED_H],
+
+      AC_CHECK_TYPE([struct sched_param],
+        [HAVE_STRUCT_SCHED_PARAM=1], [HAVE_STRUCT_SCHED_PARAM=0],
+-       [#include <sched.h>])
++       [#include <errno.h>
++        #include <sched.h>])
+      AC_SUBST([HAVE_STRUCT_SCHED_PARAM])
+
+      dnl Ensure the type pid_t gets defined.
+diff --git a/tests/test-sched.c b/tests/test-sched.c
+index 5a64120..c118b5e 100644
+--- a/tests/test-sched.c
++++ b/tests/test-sched.c
+@@ -18,6 +18,7 @@
+
+ #include <config.h>
+
++#include <errno.h>
+ #include <sched.h>
+
+ /* Check that 'struct sched_param' is defined.  */
