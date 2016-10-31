@@ -120,6 +120,7 @@ from spack.util.naming import mod_to_class
 from spack.util.prefix import Prefix
 from spack.util.string import *
 import spack.util.spack_yaml as syaml
+import spack.util.spack_json as sjson
 from spack.util.spack_yaml import syaml_dict
 from spack.util.crypto import prefix_bits
 from spack.version import *
@@ -156,7 +157,6 @@ __all__ = [
     'UnsatisfiableArchitectureSpecError',
     'UnsatisfiableProviderSpecError',
     'UnsatisfiableDependencySpecError',
-    'SpackYAMLError',
     'AmbiguousHashError']
 
 # Valid pattern for an identifier in Spack
@@ -1019,15 +1019,21 @@ class Spec(object):
 
         return syaml_dict([(self.name, d)])
 
-    def to_yaml(self, stream=None):
+    def to_dict(self):
         node_list = []
         for s in self.traverse(order='pre', deptype=('link', 'run')):
             node = s.to_node_dict()
             node[s.name]['hash'] = s.dag_hash()
             node_list.append(node)
+
+        return syaml_dict([('spec', node_list)])
+
+    def to_yaml(self, stream=None):
         return syaml.dump(
-            syaml_dict([('spec', node_list)]),
-            stream=stream, default_flow_style=False)
+            self.to_dict(), stream=stream, default_flow_style=False)
+
+    def to_json(self, stream=None):
+        return sjson.dump(self.to_dict(), stream)
 
     @staticmethod
     def from_node_dict(node):
@@ -1090,22 +1096,13 @@ class Spec(object):
             yield dep_name, dag_hash, list(deptypes)
 
     @staticmethod
-    def from_yaml(stream):
+    def from_dict(data):
         """Construct a spec from YAML.
 
         Parameters:
-        stream -- string or file object to read from.
-
-        TODO: currently discards hashes. Include hashes when they
-        represent more than the DAG does.
-
+        data -- a nested dict/list data structure read from YAML or JSON.
         """
-        try:
-            yfile = syaml.load(stream)
-        except MarkedYAMLError as e:
-            raise SpackYAMLError("error parsing YAML spec:", str(e))
-
-        nodes = yfile['spec']
+        nodes = data['spec']
 
         # Read nodes out of list.  Root spec is the first element;
         # dependencies are the following elements.
@@ -1129,6 +1126,32 @@ class Spec(object):
                     deps[dname], set(dtypes))
 
         return spec
+
+    @staticmethod
+    def from_yaml(stream):
+        """Construct a spec from YAML.
+
+        Parameters:
+        stream -- string or file object to read from.
+        """
+        try:
+            data = syaml.load(stream)
+            return Spec.from_dict(data)
+        except MarkedYAMLError as e:
+            raise syaml.SpackYAMLError("error parsing YAML spec:", str(e))
+
+    @staticmethod
+    def from_json(stream):
+        """Construct a spec from JSON.
+
+        Parameters:
+        stream -- string or file object to read from.
+        """
+        try:
+            data = sjson.load(stream)
+            return Spec.from_dict(data)
+        except Exception as e:
+            raise sjson.SpackJSONError("error parsing JSON spec:", str(e))
 
     def _concretize_helper(self, presets=None, visited=None):
         """Recursive helper function for concretize().
@@ -2899,11 +2922,6 @@ class UnsatisfiableDependencySpecError(UnsatisfiableSpecError):
     def __init__(self, provided, required):
         super(UnsatisfiableDependencySpecError, self).__init__(
             provided, required, "dependency")
-
-
-class SpackYAMLError(spack.error.SpackError):
-    def __init__(self, msg, yaml_error):
-        super(SpackYAMLError, self).__init__(msg, str(yaml_error))
 
 
 class AmbiguousHashError(SpecError):
