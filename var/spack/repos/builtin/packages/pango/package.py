@@ -36,7 +36,8 @@ class Pango(Package):
     list_depth = 2
 
     version('1.36.8', '217a9a753006275215fa9fa127760ece')
-    version('1.40.1', '6fc88c6529890d6c8e03074d57a3eceb')
+    version('1.40.1', '6fc88c6529890d6c8e03074d57a3eceb',
+            url="http://ftp.gnome.org/pub/gnome/sources/pango/1.40/pango-1.40.1.tar.xz")
 
     depends_on("pkg-config", type="build")
     depends_on("harfbuzz")
