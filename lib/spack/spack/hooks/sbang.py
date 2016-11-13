@@ -78,7 +78,7 @@ def filter_shebang(path):
     if saved_mode is not None:
         os.chmod(path, saved_mode)
 
-    tty.warn("Patched overlong shebang in %s" % path)
+    tty.msg("Patched long shebang in %s" % path)
 
 
 def filter_shebangs_in_directory(directory, filenames=None):
