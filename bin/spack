@@ -83,23 +83,129 @@ import llnl.util.tty as tty
 from llnl.util.tty.color import *
 import spack
 from spack.error import SpackError
-import argparse
+from argparse import _ArgumentGroup, ArgumentParser, RawTextHelpFormatter
+
+
+class SpackArgumentParser(ArgumentParser):
+    def format_help_sections(self, sections, options='all', other=False):
+        """Print help on subcommands in neatly formatted sections."""
+        formatter = self._get_formatter()
+
+        # List of subcommand actions. Argparse internals are nasty!
+        # Note: can only call this once.  Even nastier!
+        subcmd_actions = self._subparsers._actions[-1]._get_subactions()
+        remaining = set(a.metavar for a in subcmd_actions)
+
+        def add_group(group):
+            formatter.start_section(group.title)
+            formatter.add_text(group.description)
+            formatter.add_arguments(group._group_actions)
+            formatter.end_section()
+
+        def add_subcommand_group(title, commands):
+            """Add informational help group for a specific subcommand set."""
+            cmd_set = set(commands)
+
+            # make a dict of commands of interest
+            cmds = dict((action.metavar, action) for action in subcmd_actions
+                        if action.metavar in cmd_set)
+
+            # add commands to a group in order, and add the group
+            group = _ArgumentGroup(self, title=title)
+            for name in commands:
+                group._add_action(cmds[name])
+                if name in remaining:
+                    remaining.remove(name)
+            add_group(group)
+
+        # strip out the optionals we don't want if we're not showing all
+        if options != 'all':
+            opts = dict((opt.option_strings[0].strip('-'), opt)
+                        for opt in self._optionals._group_actions)
+
+            new_actions = []
+            for letter in options:
+                new_actions.append(opts[letter])
+
+            self._optionals._group_actions = new_actions
+
+        all_opts = ''.join(opt.option_strings[0].strip('-')
+                           for opt in self._optionals._group_actions)
+
+        # usage
+        formatter.add_text(
+            "usage: %s [-%s] <subcommand> [...]" % (self.prog, all_opts))
+
+        # description
+        formatter.add_text(self.description)
+
+        # start subcommands
+        formatter.add_text("subcommands:")
+
+        # add groups in the order they came in.
+        for title, commands in sections:
+            add_subcommand_group(title, commands)
+
+        # print remaining commands in "other" group if asked for
+        if other:
+            add_subcommand_group('other commands', sorted(remaining))
+
+        # optionals
+        add_group(self._optionals)
+
+        # epilog
+        formatter.add_text(self.epilog)
+
+        # determine help from format above
+        return formatter.format_help()
+
+    def format_help(self):
+        commands = [
+            ('basic usage', [
+                'list', 'find', 'info', 'install', 'uninstall', 'compilers',
+                'arch']),
+            ('packaging', [
+                'create', 'edit', 'test', 'flake8']),
+            ('environment', [
+                'load', 'unload', 'module', 'view']),
+            ('app developers', [
+                'diy', 'setup'])]
+
+        return self.format_help_sections(commands, 'hdkV')
+
+    def format_help_long(self):
+        commands = [
+            ('basic usage', [
+                'list', 'find', 'info', 'install', 'uninstall', 'compilers']),
+            ('extensions (for Python, R, etc.)', [
+                'extensions', 'activate', 'deactivate']),
+            ('advanced usage', [
+                'spec', 'graph', 'dependents', 'clean', 'purge', 'repo',
+                'mirror']),
+            ('packaging', [
+                'create', 'edit', 'md5', 'test', 'flake8', 'env', 'md5',
+                'checksum']),
+            ('environment', [
+                'load', 'unload', 'module', 'view']),
+            ('build pipeline', [
+                'fetch', 'stage', 'patch', 'configure', 'build',
+                'install']),
+            ('app developers', [
+                'diy', 'setup']),
+            ('spack developers', [
+                'cd', 'location'])]
+
+        return self.format_help_sections(commands, 'all', other=True)
+
 
 # Command parsing
-parser = argparse.ArgumentParser(
-    formatter_class=argparse.RawTextHelpFormatter,
-    description="Spack: the Supercomputing PACKage Manager." + colorize("""
+parser = SpackArgumentParser(
+    formatter_class=RawTextHelpFormatter,
+    description="A flexible package manager that supports multiple versions,\n"
+    "configurations, platforms, and compilers.")
 
-spec expressions:
-  PACKAGE [CONSTRAINTS]
 
-    CONSTRAINTS:
-      @c{@version}
-      @g{%compiler  @compiler_version}
-      @B{+variant}
-      @r{-variant} or @r{~variant}
-      @m{=architecture}
-      [^DEPENDENCY [CONSTRAINTS] ...]"""))
+spack.parser = parser
 
 parser.add_argument('-d', '--debug', action='store_true',
                     help="write out debug logs during compile")

@@ -33,7 +33,7 @@ import llnl.util.tty as tty
 import spack
 from llnl.util.tty.colify import colify
 
-description = "print available spack packages to stdout in different formats"
+description = "query and show packages that can be installed"
 
 formatters = {}
 

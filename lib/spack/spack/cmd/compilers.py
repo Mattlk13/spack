@@ -25,7 +25,7 @@
 import spack
 from spack.cmd.compiler import compiler_list
 
-description = "list available compilers, same as 'spack compiler list'"
+description = "list available compilers"
 
 
 def setup_parser(subparser):

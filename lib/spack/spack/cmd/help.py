@@ -22,16 +22,46 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
+import sys
+from llnl.util.tty.color import colorize
+
 description = "get help on spack and its commands"
 
 
 def setup_parser(subparser):
-    subparser.add_argument('help_command', nargs='?', default=None,
-                           help='command to get help on')
+    help_cmd_group = subparser.add_mutually_exclusive_group()
+    help_cmd_group.add_argument('help_command', nargs='?', default=None,
+                                help='command to get help on')
+
+    help_all_group = subparser.add_mutually_exclusive_group()
+    help_all_group.add_argument('-a', '--all', action='store_true',
+                                help='print all available commands')
+
+    help_spec_group = subparser.add_mutually_exclusive_group()
+    help_spec_group.add_argument('-s', '--spec', action='store_true',
+                                 help='print help on the spec syntax.')
 
 
 def help(parser, args):
     if args.help_command:
         parser.parse_args([args.help_command, '-h'])
+
+    elif args.all:
+        print parser.format_help_long()
+
+    elif args.spec:
+        print colorize(
+            """\
+spec expressions:
+    <package>                                    package name
+      @c{@<version>}                                 version
+      @g{%<compiler>@<version>}                      compiler
+      @B{+<name>}|@r{-<name>}|@r{~<name>}                    variants
+      @m{platform=<name>} @m{os=<name>} @m{target=<name>}    architecture
+      /<hash>                                    ref by hash
+      ^<package> [...]                           dependency constraints
+""", color=sys.stdout.isatty())
+        # TODO: add some examples here.
+
     else:
         parser.print_help()

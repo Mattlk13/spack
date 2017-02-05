@@ -29,7 +29,7 @@ import spack.cmd.common.arguments as arguments
 
 from spack.cmd import display_specs
 
-description = "find installed spack packages"
+description = "query and show installed packages"
 
 
 def setup_parser(subparser):
