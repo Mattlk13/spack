@@ -82,6 +82,7 @@ import platform as py_platform
 from llnl.util.lang import memoized, list_modules, key_ordering
 from llnl.util.filesystem import join_path
 import llnl.util.tty as tty
+from llnl.util.cpu_name import get_cpu_name
 
 import spack
 from spack.util.naming import mod_to_class
@@ -335,7 +336,7 @@ class OperatingSystem(object):
                 if newcount <= prevcount:
                     continue
 
-            compilers[ver] = cmp_cls(spec, self, py_platform.machine(), paths)
+            compilers[ver] = cmp_cls(spec, self, get_cpu_name(), paths)
 
         return list(compilers.values())
 
