@@ -47,6 +47,11 @@ class Pango(AutotoolsPackage):
     depends_on("cairo~X", when='~X')
     depends_on("cairo+X", when='+X')
     depends_on("glib")
+    depends_on('gobject-introspection')
+    depends_on('python')
 
     def install(self, spec, prefix):
         make("install", parallel=False)
+
+    def setup_dependent_environment(self, spack_env, run_env, dependent_spec):
+        spack_env.prepend_path("XDG_DATA_DIRS", join_path(self.prefix, 'share'))
