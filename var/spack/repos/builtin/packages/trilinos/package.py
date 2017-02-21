@@ -44,7 +44,8 @@ class Trilinos(CMakePackage):
     """
     homepage = "https://trilinos.org/"
     base_url = "https://github.com/trilinos/Trilinos/archive"
-
+    version('xsdk-0.2.0',
+            git='https://github.com/trilinos/Trilinos.git', tag='develop')
     version('develop',
             git='https://github.com/trilinos/Trilinos.git', tag='develop')
     version('master',
@@ -114,6 +115,10 @@ class Trilinos(CMakePackage):
     # work at the end. But let's avoid all this by simply using shared libs
     depends_on('mumps@5.0:+mpi+shared', when='+mumps')
     depends_on('scalapack', when='+mumps')
+    depends_on('superlu-dist@develop', when='@develop:+superlu-dist')
+    depends_on('superlu-dist@xsdk-0.2.0', when='@xsdk-0.2.0+superlu-dist')
+    depends_on('hypre@xsdk-0.2.0~internal-superlu', when='@xsdk-0.2.0+hypre')
+    depends_on('hypre@develop~internal-superlu', when='@develop+hypre')
     depends_on('superlu-dist@:4.3', when='@:12.6.1+superlu-dist')
     depends_on('superlu-dist', when='@12.6.2:+superlu-dist')
     depends_on('superlu+fpic@4.3', when='+superlu')
