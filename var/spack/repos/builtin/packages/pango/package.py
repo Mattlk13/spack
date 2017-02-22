@@ -48,7 +48,6 @@ class Pango(AutotoolsPackage):
     depends_on("cairo+X", when='+X')
     depends_on("glib")
     depends_on('gobject-introspection')
-    depends_on('python')
 
     def install(self, spec, prefix):
         make("install", parallel=False)
