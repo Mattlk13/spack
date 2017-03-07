@@ -29,20 +29,19 @@ import hashlib
 import shutil
 import tempfile
 import getpass
-from urlparse import urljoin
 from six import string_types
 from six import iteritems
+from six.moves.urllib.parse import urljoin
 
 import llnl.util.tty as tty
 import llnl.util.lock
 from llnl.util.filesystem import *
 
-import spack.util.pattern as pattern
-
 import spack
 import spack.config
-import spack.fetch_strategy as fs
 import spack.error
+import spack.fetch_strategy as fs
+import spack.util.pattern as pattern
 from spack.version import *
 from spack.util.path import canonicalize_path
 from spack.util.crypto import prefix_bits, bit_length
