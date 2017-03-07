@@ -46,6 +46,7 @@ import os.path
 import re
 import string
 import textwrap
+from six import iteritems
 
 import llnl.util.tty as tty
 from llnl.util.filesystem import join_path, mkdirp
@@ -213,7 +214,7 @@ def parse_config_options(module_generator):
             for x in arglist:
                 yield (x, )
         else:
-            for x in arglist.iteritems():
+            for x in iteritems(arglist):
                 yield x
 
     for method, arglist in environment_actions.items():

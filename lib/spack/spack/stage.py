@@ -31,6 +31,7 @@ import tempfile
 import getpass
 from urlparse import urljoin
 from six import string_types
+from six import iteritems
 
 import llnl.util.tty as tty
 import llnl.util.lock
@@ -549,7 +550,7 @@ class ResourceStage(Stage):
         if not isinstance(placement, dict):
             placement = {'': placement}
         # Make the paths in the dictionary absolute and link
-        for key, value in placement.iteritems():
+        for key, value in iteritems(placement):
             target_path = join_path(
                 root_stage.source_path, resource.destination)
             destination_path = join_path(target_path, value)
@@ -662,7 +663,7 @@ class DIYStage(object):
 def _get_mirrors():
     """Get mirrors from spack configuration."""
     config = spack.config.get_config('mirrors')
-    return [val for name, val in config.iteritems()]
+    return [val for name, val in iteritems(config)]
 
 
 def ensure_access(file=spack.stage_path):

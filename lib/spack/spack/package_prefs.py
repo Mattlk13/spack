@@ -23,6 +23,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
 from six import string_types
+from six import iteritems
 
 import spack
 import spack.error
@@ -234,7 +235,7 @@ def spec_externals(spec):
     if (not pkg_paths) and (not pkg_modules):
         return []
 
-    for external_spec, path in pkg_paths.iteritems():
+    for external_spec, path in iteritems(pkg_paths):
         if not path:
             # skip entries without paths (avoid creating extra Specs)
             continue
@@ -243,7 +244,7 @@ def spec_externals(spec):
         if external_spec.satisfies(spec):
             external_specs.append(external_spec)
 
-    for external_spec, module in pkg_modules.iteritems():
+    for external_spec, module in iteritems(pkg_modules):
         if not module:
             continue
 

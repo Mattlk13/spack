@@ -25,6 +25,8 @@
 """Simple wrapper around JSON to guarantee consistent use of load/dump. """
 import json
 from six import string_types
+from six import iteritems
+
 import spack.error
 
 __all__ = ['load', 'dump', 'SpackJSONError']
@@ -65,7 +67,7 @@ def _byteify(data, ignore_dicts=False):
     if isinstance(data, dict) and not ignore_dicts:
         return dict((_byteify(key, ignore_dicts=True),
                      _byteify(value, ignore_dicts=True)) for key, value in
-                    data.iteritems())
+                    iteritems(data))
     # if it's anything else, return it in its original form
     return data
 

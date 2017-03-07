@@ -57,6 +57,7 @@ import os
 import shutil
 import sys
 import traceback
+from six import iteritems
 
 import llnl.util.lang as lang
 import llnl.util.tty as tty
@@ -310,7 +311,7 @@ def set_build_environment_variables(pkg, env, dirty=False):
     environment = compiler.environment
     if 'set' in environment:
         env_to_set = environment['set']
-        for key, value in env_to_set.iteritems():
+        for key, value in iteritems(env_to_set):
             env.set('SPACK_ENV_SET_%s' % key, value)
             env.set('%s' % key, value)
         # Let shell know which variables to set

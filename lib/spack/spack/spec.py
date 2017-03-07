@@ -103,6 +103,7 @@ import itertools
 from operator import attrgetter
 from six import StringIO
 from six import string_types
+from six import iteritems
 
 import llnl.util.tty as tty
 import spack
@@ -391,7 +392,7 @@ class ArchSpec(object):
             raise UnsatisfiableArchitectureSpecError(self, other)
 
         constrained = False
-        for attr, svalue in self.to_cmp_dict().iteritems():
+        for attr, svalue in iteritems(self.to_cmp_dict()):
             ovalue = getattr(other, attr)
             if svalue is None and ovalue is not None:
                 setattr(self, attr, ovalue)
@@ -406,7 +407,7 @@ class ArchSpec(object):
 
     @property
     def concrete(self):
-        return all(v for k, v in self.to_cmp_dict().iteritems())
+        return all(v for k, v in iteritems(self.to_cmp_dict()))
 
     def to_cmp_dict(self):
         """Returns a dictionary that can be used for field comparison."""
@@ -728,7 +729,7 @@ class FlagMap(HashableMap):
         return clone
 
     def _cmp_key(self):
-        return tuple((k, tuple(v)) for k, v in sorted(self.iteritems()))
+        return tuple((k, tuple(v)) for k, v in sorted(iteritems(self)))
 
     def __str__(self):
         sorted_keys = filter(
@@ -1056,7 +1057,7 @@ class Spec(object):
             new_vals = tuple(kwargs.get(arg, None) for arg in arch_attrs)
             self.architecture = ArchSpec(*new_vals)
         else:
-            new_attrvals = [(a, v) for a, v in kwargs.iteritems()
+            new_attrvals = [(a, v) for a, v in iteritems(kwargs)
                             if a in arch_attrs]
             for new_attr, new_value in new_attrvals:
                 if getattr(self.architecture, new_attr):

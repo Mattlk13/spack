@@ -42,6 +42,7 @@ filesystem.
 import os
 import socket
 from six import string_types
+from six import iteritems
 
 from yaml.error import MarkedYAMLError, YAMLError
 
@@ -512,7 +513,7 @@ class Database(object):
                 new_spec, path, installed, ref_count=0, explicit=explicit)
 
             # Connect dependencies from the DB to the new copy.
-            for name, dep in spec.dependencies_dict(_tracked_deps).iteritems():
+            for name, dep in iteritems(spec.dependencies_dict(_tracked_deps)):
                 dkey = dep.spec.dag_hash()
                 new_spec._add_dependency(self._data[dkey].spec, dep.deptypes)
                 self._data[dkey].ref_count += 1

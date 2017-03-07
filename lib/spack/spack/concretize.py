@@ -34,6 +34,7 @@ TODO: make this customizable and allow users to configure
       concretization  policies.
 """
 from __future__ import print_function
+from six import iteritems
 
 import spack
 import spack.spec
@@ -263,7 +264,7 @@ class DefaultConcretizer(object):
         while not spec.architecture.concrete and default_archs:
             arch = default_archs.pop(0)
 
-            replacement_fields = [k for k, v in arch.to_cmp_dict().iteritems()
+            replacement_fields = [k for k, v in iteritems(arch.to_cmp_dict())
                                   if v and not getattr(spec.architecture, k)]
             for field in replacement_fields:
                 setattr(spec.architecture, field, getattr(arch, field))

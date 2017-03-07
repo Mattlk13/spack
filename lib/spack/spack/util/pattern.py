@@ -25,6 +25,7 @@
 import inspect
 import collections
 import functools
+from six import iteritems
 
 
 def composite(interface=None, method_list=None, container=list):
@@ -111,7 +112,7 @@ def composite(interface=None, method_list=None, container=list):
             # python@2.7: interface_methods_dict = {name: IterateOver(name,
             # method) for name, method in interface_methods.iteritems()}
             interface_methods_dict = {}
-            for name, method in interface_methods.iteritems():
+            for name, method in iteritems(interface_methods):
                 interface_methods_dict[name] = IterateOver(name, method)
             ##########
             dictionary_for_type_call.update(interface_methods_dict)
