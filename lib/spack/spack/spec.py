@@ -102,6 +102,7 @@ import hashlib
 import itertools
 from operator import attrgetter
 from six import StringIO
+from six import string_types
 
 import llnl.util.tty as tty
 import spack
@@ -221,7 +222,7 @@ def canonical_deptype(deptype):
     if deptype is None:
         return alldeps
 
-    elif isinstance(deptype, basestring):
+    elif isinstance(deptype, string_types):
         return special_types.get(deptype, (deptype,))
 
     elif isinstance(deptype, (tuple, list)):
@@ -269,7 +270,7 @@ class ArchSpec(object):
             spec_like = args[0]
             if isinstance(spec_like, ArchSpec):
                 self._dup(spec_like)
-            elif isinstance(spec_like, basestring):
+            elif isinstance(spec_like, string_types):
                 spec_fields = spec_like.split("-")
 
                 if len(spec_fields) == 3:
@@ -463,7 +464,7 @@ class CompilerSpec(object):
             arg = args[0]
             # If there is one argument, it's either another CompilerSpec
             # to copy or a string to parse
-            if isinstance(arg, basestring):
+            if isinstance(arg, string_types):
                 c = SpecParser().parse_compiler(arg)
                 self.name = c.name
                 self.versions = c.versions
@@ -917,7 +918,7 @@ class Spec(object):
             return
 
         # Parse if the spec_like is a string.
-        if not isinstance(spec_like, basestring):
+        if not isinstance(spec_like, string_types):
             raise TypeError("Can't make spec out of %s" % type(spec_like))
 
         spec_list = SpecParser().parse(spec_like)
@@ -1017,9 +1018,9 @@ class Spec(object):
         if name in self.variants:
             raise DuplicateVariantError(
                 "Cannot specify variant '%s' twice" % name)
-        if isinstance(value, basestring) and value.upper() == 'TRUE':
+        if isinstance(value, string_types) and value.upper() == 'TRUE':
             value = True
-        elif isinstance(value, basestring) and value.upper() == 'FALSE':
+        elif isinstance(value, string_types) and value.upper() == 'FALSE':
             value = False
         self.variants[name] = VariantSpec(name, value)
 
@@ -1218,7 +1219,7 @@ class Spec(object):
         # get initial values for kwargs
         depth = kwargs.get('depth', False)
         key_fun = kwargs.get('key', id)
-        if isinstance(key_fun, basestring):
+        if isinstance(key_fun, string_types):
             key_fun = attrgetter(key_fun)
         yield_root = kwargs.get('root', True)
         cover = kwargs.get('cover', 'nodes')
@@ -1420,7 +1421,7 @@ class Spec(object):
         formats so that reindex will work on old specs/databases.
         """
         for dep_name, elt in dependency_dict.items():
-            if isinstance(elt, basestring):
+            if isinstance(elt, string_types):
                 # original format, elt is just the dependency hash.
                 dag_hash, deptypes = elt, ['build', 'link']
             elif isinstance(elt, tuple):

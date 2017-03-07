@@ -24,6 +24,7 @@
 ##############################################################################
 """Simple wrapper around JSON to guarantee consistent use of load/dump. """
 import json
+from six import string_types
 import spack.error
 
 __all__ = ['load', 'dump', 'SpackJSONError']
@@ -36,7 +37,7 @@ _json_dump_args = {
 
 def load(stream):
     """Spack JSON needs to be ordered to support specs."""
-    if isinstance(stream, basestring):
+    if isinstance(stream, string_types):
         return _byteify(json.loads(stream, object_hook=_byteify),
                         ignore_dicts=True)
     else:

@@ -30,6 +30,7 @@ import shutil
 import tempfile
 import getpass
 from urlparse import urljoin
+from six import string_types
 
 import llnl.util.tty as tty
 import llnl.util.lock
@@ -84,7 +85,7 @@ def get_tmp_root():
     if _tmp_root is None:
         config = spack.config.get_config('config')
         candidates = config['build_stage']
-        if isinstance(candidates, basestring):
+        if isinstance(candidates, string_types):
             candidates = [candidates]
 
         path = _first_accessible_path(candidates)
@@ -188,7 +189,7 @@ class Stage(object):
         """
         # TODO: fetch/stage coupling needs to be reworked -- the logic
         # TODO: here is convoluted and not modular enough.
-        if isinstance(url_or_fetch_strategy, basestring):
+        if isinstance(url_or_fetch_strategy, string_types):
             self.fetcher = fs.from_url(url_or_fetch_strategy)
         elif isinstance(url_or_fetch_strategy, fs.FetchStrategy):
             self.fetcher = url_or_fetch_strategy

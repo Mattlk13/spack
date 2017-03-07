@@ -41,6 +41,7 @@ filesystem.
 """
 import os
 import socket
+from six import string_types
 
 from yaml.error import MarkedYAMLError, YAMLError
 
@@ -260,7 +261,7 @@ class Database(object):
             raise ValueError("Invalid database format: %s" % format)
 
         try:
-            if isinstance(stream, basestring):
+            if isinstance(stream, string_types):
                 with open(stream, 'r') as f:
                     fdata = load(f)
             else:

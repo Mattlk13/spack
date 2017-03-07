@@ -242,7 +242,7 @@ class DefaultConcretizer(object):
 
     def concretize_architecture(self, spec):
         """If the spec is empty provide the defaults of the platform. If the
-        architecture is not a basestring, then check if either the platform,
+        architecture is not a string type, then check if either the platform,
         target or operating system are concretized. If any of the fields are
         changed then return True. If everything is concretized (i.e the
         architecture attribute is a namedtuple of classes) then return False.

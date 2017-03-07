@@ -52,6 +52,7 @@ import copy
 import os
 import re
 import sys
+from six import string_types
 
 import yaml
 import jsonschema
@@ -307,7 +308,7 @@ def _mark_overrides(data):
     elif isinstance(data, dict):
         marked = {}
         for key, val in data.iteritems():
-            if isinstance(key, basestring) and key.endswith(':'):
+            if isinstance(key, string_types) and key.endswith(':'):
                 key = syaml.syaml_str(key[:-1])
                 key.override = True
             marked[key] = _mark_overrides(val)

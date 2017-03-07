@@ -43,6 +43,7 @@ import sys
 import textwrap
 import time
 from six import StringIO
+from six import string_types
 
 import llnl.util.lock
 import llnl.util.tty as tty
@@ -1356,7 +1357,7 @@ class PackageBase(object):
         """This function checks whether install succeeded."""
 
         def check_paths(path_list, filetype, predicate):
-            if isinstance(path_list, basestring):
+            if isinstance(path_list, string_types):
                 path_list = [path_list]
 
             for path in path_list:

@@ -22,6 +22,7 @@
 # License along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 ##############################################################################
+from six import string_types
 
 import spack
 import spack.error
@@ -180,7 +181,7 @@ class PreferredPackages(object):
             variants = self.preferred.get(pkg, {}).get('variants', '')
             if variants:
                 break
-        if not isinstance(variants, basestring):
+        if not isinstance(variants, string_types):
             variants = " ".join(variants)
         pkg = spack.repo.get(pkgname)
         spec = spack.spec.Spec("%s %s" % (pkgname, variants))

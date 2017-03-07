@@ -46,6 +46,8 @@ import re
 import shutil
 import copy
 from functools import wraps
+from six import string_types
+
 import llnl.util.tty as tty
 from llnl.util.filesystem import *
 import spack
@@ -461,7 +463,7 @@ class VCSFetchStrategy(FetchStrategy):
 
         patterns = kwargs.get('exclude', None)
         if patterns is not None:
-            if isinstance(patterns, basestring):
+            if isinstance(patterns, string_types):
                 patterns = [patterns]
             for p in patterns:
                 tar.add_default_arg('--exclude=%s' % p)

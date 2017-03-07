@@ -47,6 +47,7 @@ import re
 import numbers
 from bisect import bisect_left
 from functools import wraps
+from six import string_types
 
 from functools_backport import total_ordering
 from spack.util.spack_yaml import syaml_dict
@@ -375,9 +376,9 @@ class Version(object):
 class VersionRange(object):
 
     def __init__(self, start, end):
-        if isinstance(start, basestring):
+        if isinstance(start, string_types):
             start = Version(start)
-        if isinstance(end, basestring):
+        if isinstance(end, string_types):
             end = Version(end)
 
         self.start = start
@@ -568,7 +569,7 @@ class VersionList(object):
     def __init__(self, vlist=None):
         self.versions = []
         if vlist is not None:
-            if isinstance(vlist, basestring):
+            if isinstance(vlist, string_types):
                 vlist = _string_to_version(vlist)
                 if type(vlist) == VersionList:
                     self.versions = vlist.versions
@@ -796,7 +797,7 @@ def ver(obj):
     """
     if isinstance(obj, (list, tuple)):
         return VersionList(obj)
-    elif isinstance(obj, basestring):
+    elif isinstance(obj, string_types):
         return _string_to_version(obj)
     elif isinstance(obj, (int, float)):
         return _string_to_version(str(obj))
