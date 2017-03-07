@@ -85,11 +85,6 @@ class OrderedLineLoader(Loader):
 
     def construct_yaml_str(self, node):
         value = self.construct_scalar(node)
-        try:
-            value = value.encode('ascii')
-        except UnicodeEncodeError:
-            pass
-
         value = syaml_str(value)
 
         mark(value, node)
