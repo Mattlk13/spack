@@ -47,6 +47,7 @@ import shutil
 import copy
 from functools import wraps
 from six import string_types
+from six import with_metaclass
 
 import llnl.util.tty as tty
 from llnl.util.filesystem import *
@@ -76,20 +77,19 @@ def _needs_stage(fun):
     return wrapper
 
 
-class FetchStrategy(object):
+class FSMeta(type):
+    """This metaclass registers all fetch strategies in a list."""
+    def __init__(cls, name, bases, dict):
+        type.__init__(cls, name, bases, dict)
+        if cls.enabled:
+            all_strategies.append(cls)
 
+
+class FetchStrategy(with_metaclass(FSMeta, object)):
     """Superclass of all fetch strategies."""
     enabled = False  # Non-abstract subclasses should be enabled.
     required_attributes = None  # Attributes required in version() args.
 
-    class __metaclass__(type):
-
-        """This metaclass registers all fetch strategies in a list."""
-
-        def __init__(cls, name, bases, dict):
-            type.__init__(cls, name, bases, dict)
-            if cls.enabled:
-                all_strategies.append(cls)
 
     def __init__(self):
         # The stage is initialized late, so that fetch strategies can be

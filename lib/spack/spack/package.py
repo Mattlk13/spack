@@ -44,6 +44,7 @@ import textwrap
 import time
 from six import StringIO
 from six import string_types
+from six import with_metaclass
 
 import llnl.util.lock
 import llnl.util.tty as tty
@@ -240,7 +241,7 @@ def on_package_attributes(**attr_dict):
     return _execute_under_condition
 
 
-class PackageBase(object):
+class PackageBase(with_metaclass(PackageMeta, object)):
     """This is the superclass for all spack packages.
 
     ***The Package class***
@@ -477,7 +478,6 @@ class PackageBase(object):
     Package creators override functions like install() (all of them do this),
     clean() (some of them do this), and others to provide custom behavior.
     """
-    __metaclass__ = PackageMeta
     #
     # These are default values for instance variables.
     #
