@@ -27,11 +27,12 @@ import copy
 import os
 import re
 import shutil
+from six import StringIO
 
-import cStringIO
 import llnl.util.filesystem
 import llnl.util.lang
 import ordereddict_backport
+
 import py
 import pytest
 import spack
@@ -56,11 +57,8 @@ def no_stdin_duplication(monkeypatch):
     """Duplicating stdin (or any other stream) returns an empty
     cStringIO object.
     """
-    monkeypatch.setattr(
-        llnl.util.lang,
-        'duplicate_stream',
-        lambda x: cStringIO.StringIO()
-    )
+    monkeypatch.setattr(llnl.util.lang, 'duplicate_stream',
+                        lambda x: StringIO())
 
 
 @pytest.fixture(autouse=True)

@@ -46,7 +46,7 @@ it's never been told about that version before.
 """
 import os
 import re
-from StringIO import StringIO
+from six import StringIO
 from urlparse import urlsplit, urlunsplit
 
 import llnl.util.tty as tty

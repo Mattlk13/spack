@@ -27,7 +27,7 @@ Routines for printing columnar output.  See colify() for more information.
 """
 import os
 import sys
-from StringIO import StringIO
+from six import StringIO
 
 from llnl.util.tty import terminal_size
 from llnl.util.tty.color import clen, cextra

@@ -201,7 +201,7 @@ class ProviderIndex(object):
     def from_yaml(stream):
         try:
             yfile = syaml.load(stream)
-        except MarkedYAMLError, e:
+        except MarkedYAMLError as e:
             raise spack.spec.SpackYAMLError(
                 "error parsing YAML ProviderIndex cache:", str(e))
 

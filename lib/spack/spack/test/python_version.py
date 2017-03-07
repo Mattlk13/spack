@@ -28,6 +28,8 @@ This test ensures that all Spack files are Python version 2.6 or less.
 Spack was originally 2.7, but enough systems in 2014 are still using
 2.6 on their frontend nodes that we need 2.6 to get adopted.
 """
+from __future__ import print_function
+
 import os
 import re
 import unittest
@@ -89,10 +91,10 @@ class PythonVersionTest(unittest.TestCase):
             tty.error("These files require version %d.%d:" % v)
             maxlen = max(len(f) for f, prob in msgs)
             fmt = "%%-%ds%%s" % (maxlen + 3)
-            print fmt % ('File', 'Reason')
-            print fmt % ('-' * (maxlen), '-' * 20)
+            print(fmt % ('File', 'Reason'))
+            print(fmt % ('-' * (maxlen), '-' * 20))
             for msg in msgs:
-                print fmt % msg
+                print(fmt % msg)
 
         self.assertTrue(len(all_issues) == 0)
 

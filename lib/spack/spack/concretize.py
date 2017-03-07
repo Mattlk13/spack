@@ -34,6 +34,7 @@ TODO: make this customizable and allow users to configure
       concretization  policies.
 """
 from __future__ import print_function
+
 import spack
 import spack.spec
 import spack.compilers

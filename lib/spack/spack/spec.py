@@ -97,13 +97,12 @@ expansion when it is the first character in an id typed on the command line.
 """
 import base64
 import collections
-import csv
 import ctypes
 import hashlib
 import itertools
 from operator import attrgetter
+from six import StringIO
 
-import cStringIO
 import llnl.util.tty as tty
 import spack
 import spack.architecture
@@ -113,7 +112,7 @@ import spack.parse
 import spack.store
 import spack.util.spack_json as sjson
 import spack.util.spack_yaml as syaml
-from cStringIO import StringIO
+
 from llnl.util.filesystem import find_libraries
 from llnl.util.lang import *
 from llnl.util.tty.color import *
@@ -222,7 +221,7 @@ def canonical_deptype(deptype):
     if deptype is None:
         return alldeps
 
-    elif isinstance(deptype, str):
+    elif isinstance(deptype, basestring):
         return special_types.get(deptype, (deptype,))
 
     elif isinstance(deptype, (tuple, list)):
@@ -2407,11 +2406,8 @@ class Spec(object):
         if query_parameters:
             # We have extra query parameters, which are comma separated
             # values
-            f = cStringIO.StringIO(query_parameters.pop())
-            try:
-                query_parameters = next(csv.reader(f, skipinitialspace=True))
-            except StopIteration:
-                query_parameters = ['']
+            csv = query_parameters.pop().strip()
+            query_parameters = re.split(r'\s*,\s*', csv)
 
         try:
             value = next(

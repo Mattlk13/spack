@@ -42,6 +42,7 @@ import re
 import sys
 import textwrap
 import time
+from six import StringIO
 
 import llnl.util.lock
 import llnl.util.tty as tty
@@ -56,7 +57,7 @@ import spack.mirror
 import spack.repository
 import spack.url
 import spack.util.web
-from StringIO import StringIO
+
 from llnl.util.filesystem import *
 from llnl.util.lang import *
 from llnl.util.link_tree import LinkTree
