@@ -178,9 +178,9 @@ class Executable(object):
             if output is str or error is str:
                 result = ''
                 if output is str:
-                    result += str(out)
+                    result += out.decode('utf-8')
                 if error is str:
-                    result += str(err)
+                    result += err.decode('utf-8')
                 return result
 
         except OSError as e:

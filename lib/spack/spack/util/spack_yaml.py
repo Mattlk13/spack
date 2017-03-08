@@ -176,7 +176,7 @@ class OrderedLineDumper(Dumper):
             # if it's a syaml_dict, preserve OrderedDict order.
             # Otherwise do the default thing.
             sort = not isinstance(mapping, syaml_dict)
-            mapping = mapping.items()
+            mapping = list(mapping.items())
             if sort:
                 mapping.sort()
 
