@@ -68,7 +68,7 @@ def config_variable_cols(elts, console_width, padding, cols=0):
     max_cols = min(len(elts), max_cols)
 
     # Range of column counts to try.  If forced, use the supplied value.
-    col_range = [cols] if cols else xrange(1, max_cols + 1)
+    col_range = [cols] if cols else range(1, max_cols + 1)
 
     # Determine the most columns possible for the console width.
     configs = [ColumnConfig(c) for c in col_range]
@@ -196,9 +196,9 @@ def colify(elts, **options):
     rows = (len(elts) + cols - 1) / cols
     rows_last_col = len(elts) % rows
 
-    for row in xrange(rows):
+    for row in range(rows):
         output.write(" " * indent)
-        for col in xrange(cols):
+        for col in range(cols):
             elt = col * rows + row
             width = config.widths[col] + cextra(elts[elt])
             if col < cols - 1:
@@ -233,7 +233,7 @@ def colify_table(table, **options):
     columns = len(table[0])
 
     def transpose():
-        for i in xrange(columns):
+        for i in range(columns):
             for row in table:
                 yield row[i]
 

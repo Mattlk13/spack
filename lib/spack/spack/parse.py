@@ -120,7 +120,7 @@ class Parser(object):
     def gettok(self):
         """Puts the next token in the input stream into self.next."""
         try:
-            self.next = self.tokens.next()
+            self.next = next(self.tokens)
         except StopIteration:
             self.next = None
 

@@ -485,7 +485,7 @@ def substitution_offsets(path):
     name_offsets = offsets[1::2]
 
     ver_offsets = []
-    for i in xrange(0, len(name_parts), 2):
+    for i in range(0, len(name_parts), 2):
         vparts = re.split(ver, name_parts[i])
         voffsets = cumsum(vparts, offsets[i], len)
         ver_offsets.extend(voffsets[1::2])

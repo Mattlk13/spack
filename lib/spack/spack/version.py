@@ -217,7 +217,7 @@ class Version(object):
         segments = [a_or_n(seg) for seg in version]
 
         wc = segments[0]
-        for i in xrange(1, len(separators)):
+        for i in range(1, len(separators)):
             wc += '(?:' + separators[i] + segments[i]
 
         # Add possible alpha or beta indicator at the end of each segemnt
