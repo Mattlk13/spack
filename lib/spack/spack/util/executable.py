@@ -178,9 +178,9 @@ class Executable(object):
             if output is str or error is str:
                 result = ''
                 if output is str:
-                    result += out
+                    result += str(out)
                 if error is str:
-                    result += err
+                    result += str(err)
                 return result
 
         except OSError as e:
