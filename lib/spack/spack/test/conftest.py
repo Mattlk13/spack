@@ -310,7 +310,7 @@ def mock_archive():
             "\ttouch $prefix/dummy_file\n"
             "EOF\n"
         )
-    os.chmod(configure_path, 0755)
+    os.chmod(configure_path, 0o755)
     # Archive it
     current = tmpdir.chdir()
     archive_name = '{0}.tar.gz'.format(repo_name)
