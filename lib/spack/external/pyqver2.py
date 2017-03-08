@@ -22,8 +22,18 @@
 #
 # Copyright (c) 2009-2013 Greg Hewgill http://hewgill.com
 #
+from __future__ import print_function
+try:
+    # Python 2
+    import compiler.ast as ast
+    from compiler import parse as ast_parse
+    from compiler import walk as ast_walk
+except ImportError:
+    # Python 3
+    import ast
+    from ast import parse as ast_parse
+    from ast import walk as ast_walk
 
-import compiler
 import platform
 import sys
 
@@ -168,11 +178,11 @@ class NodeChecker(object):
             self.visit(child)
     def visitCallFunc(self, node):
         def rollup(n):
-            if isinstance(n, compiler.ast.Name):
+            if isinstance(n, ast.Name):
                 return n.name
-            elif isinstance(n, compiler.ast.Const):
+            elif isinstance(n, ast.Const):
                 return type(n.value).__name__
-            elif isinstance(n, compiler.ast.Getattr):
+            elif isinstance(n, ast.Getattr):
                 r = rollup(n.expr)
                 if r:
                     return r + "." + n.attrname
@@ -182,9 +192,9 @@ class NodeChecker(object):
             # allowed in Python 2.6
             if name in ('unicode.format', 'str.format'):
                 n = node.node
-                if isinstance(n, compiler.ast.Getattr):
+                if isinstance(n, ast.Getattr):
                     n = n.expr
-                    if isinstance(n, compiler.ast.Const):
+                    if isinstance(n, ast.Const):
                         if '{}' in n.value:
                             self.add(node, (2,7), name + ' with {} format string')
 
@@ -221,7 +231,7 @@ class NodeChecker(object):
         self.add(node, (2,4), "generator expression")
         self.default(node)
     def visitGetattr(self, node):
-        if (isinstance(node.expr, compiler.ast.Const)
+        if (isinstance(node.expr, ast.Const)
             and isinstance(node.expr.value, str)
             and node.attrname == "format"):
             self.add(node, (2,6), "string literal .format()")
@@ -249,11 +259,11 @@ class NodeChecker(object):
     def visitTryFinally(self, node):
         # try/finally with a suite generates a Stmt node as the body,
         # but try/except/finally generates a TryExcept as the body
-        if isinstance(node.body, compiler.ast.TryExcept):
+        if isinstance(node.body, ast.TryExcept):
             self.add(node, (2,5), "try/except/finally")
         self.default(node)
     def visitWith(self, node):
-        if isinstance(node.body, compiler.ast.With):
+        if isinstance(node.body, ast.With):
             self.add(node, (2,7), "with statement with multiple contexts")
         else:
             self.add(node, (2,5), "with statement")
@@ -269,15 +279,16 @@ def get_versions(source):
     (for example Python 2.6 is (2,6)) and the value are a list of features that
     require the indicated Python version.
     """
-    tree = compiler.parse(source)
-    checker = compiler.walk(tree, NodeChecker())
+    tree = ast_parse(source)
+    checker = ast_walk(tree, NodeChecker())
     return checker.vers
 
 def v27(source):
     if sys.version_info >= (2, 7):
         return qver(source)
     else:
-        print >>sys.stderr, "Not all features tested, run --test with Python 2.7"
+        print("Not all features tested, run --test with Python 2.7",
+              file=sys.stderr)
         return (2, 7)
 
 def qver(source):
@@ -374,7 +385,7 @@ if __name__ == '__main__':
         i += 1
 
     if not files:
-        print >>sys.stderr, """Usage: %s [options] source ...
+        print("""Usage: %s [options] source ...
 
         Report minimum Python version required to run given source files.
 
@@ -382,7 +393,7 @@ if __name__ == '__main__':
             report version triggers at or above version x.y in verbose mode
         -v or --verbose
             print more detailed report of version triggers for each version
-    """ % sys.argv[0]
+    """ % sys.argv[0], file=sys.stderr)
         sys.exit(1)
 
     for fn in files:
@@ -392,19 +403,19 @@ if __name__ == '__main__':
             f.close()
             ver = get_versions(source)
             if Verbose:
-                print fn
+                print(fn)
                 for v in sorted([k for k in ver.keys() if k >= MinVersion], reverse=True):
                     reasons = [x for x in uniq(ver[v]) if x]
                     if reasons:
                         # each reason is (lineno, message)
-                        print "\t%s\t%s" % (".".join(map(str, v)), ", ".join([x[1] for x in reasons]))
+                        print("\t%s\t%s" % (".".join(map(str, v)), ", ".join([x[1] for x in reasons])))
             elif Lint:
                 for v in sorted([k for k in ver.keys() if k >= MinVersion], reverse=True):
                     reasons = [x for x in uniq(ver[v]) if x]
                     for r in reasons:
                         # each reason is (lineno, message)
-                        print "%s:%s: %s %s" % (fn, r[0], ".".join(map(str, v)), r[1])
+                        print("%s:%s: %s %s" % (fn, r[0], ".".join(map(str, v)), r[1]))
             else:
-                print "%s\t%s" % (".".join(map(str, max(ver.keys()))), fn)
-        except SyntaxError, x:
-            print "%s: syntax error compiling with Python %s: %s" % (fn, platform.python_version(), x)
+                print("%s\t%s" % (".".join(map(str, max(ver.keys()))), fn))
+        except SyntaxError as x:
+            print("%s: syntax error compiling with Python %s: %s" % (fn, platform.python_version(), x))
