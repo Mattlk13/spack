@@ -58,8 +58,8 @@ class PreferredPackages(object):
 
     # Given a package name, sort component (e.g, version, compiler, ...), and
     # a second_key (used by providers), return the list
-    def _order_for_package(self, pkgname, component, second_key,
-                           test_all=True):
+    def order_for_package(self, pkgname, component, second_key=None,
+                          test_all=True):
         pkglist = [pkgname]
         if test_all:
             pkglist.append('all')
@@ -72,16 +72,24 @@ class PreferredPackages(object):
             return [str(s).strip() for s in order]
         return []
 
+    def _component_key(self, pkgname, components, a, b):
+
+
+        def okey(c):
+            return next((i for i, oc in enumerate(order) if c.satisfies(oc)),
+                        len(order))
+
+
+
     # A generic sorting function. Given a package name and sort
     # component, return less-than-0, 0, or greater-than-0 if
     # a is respectively less-than, equal to, or greater than b.
-    def _component_compare(self, pkgname, component, a, b,
-                           reverse_natural_compare, second_key):
+    def _component_compare(self, pkgname, component, a, b, second_key):
         if a is None:
             return -1
         if b is None:
             return 1
-        orderlist = self._order_for_package(pkgname, component, second_key)
+        orderlist = self.order_for_package(pkgname, component, second_key)
         a_in_list = str(a) in orderlist
         b_in_list = str(b) in orderlist
         if a_in_list and not b_in_list:
@@ -91,20 +99,17 @@ class PreferredPackages(object):
 
         cmp_a = None
         cmp_b = None
-        reverse = None
         if not a_in_list and not b_in_list:
             cmp_a = a
             cmp_b = b
-            reverse = -1 if reverse_natural_compare else 1
         else:
             cmp_a = orderlist.index(str(a))
             cmp_b = orderlist.index(str(b))
-            reverse = 1
 
         if cmp_a < cmp_b:
-            return -1 * reverse
+            return -1
         elif cmp_a > cmp_b:
-            return 1 * reverse
+            return 1
         else:
             return 0
 
@@ -118,6 +123,7 @@ class PreferredPackages(object):
         if not b or (not b.concrete and not second_key):
             return 1
         specs = self._spec_for_pkgname(pkgname, component, second_key)
+
         a_index = None
         b_index = None
         reverse = -1 if reverse_natural_compare else 1
@@ -148,7 +154,7 @@ class PreferredPackages(object):
     def _spec_for_pkgname(self, pkgname, component, second_key):
         key = (pkgname, component, second_key)
         if key not in self._spec_for_pkgname_cache:
-            pkglist = self._order_for_package(pkgname, component, second_key)
+            pkglist = self.order_for_package(pkgname, component, second_key)
             if component == 'compiler':
                 self._spec_for_pkgname_cache[key] = \
                     [spack.spec.CompilerSpec(s) for s in pkglist]
@@ -173,7 +179,7 @@ class PreferredPackages(object):
     def spec_has_preferred_provider(self, pkgname, provider_str):
         """Return True iff the named package has a list of preferred
            providers"""
-        return bool(self._order_for_package(pkgname, 'providers',
+        return bool(self.order_for_package(pkgname, 'providers',
                                             provider_str, False))
 
     def spec_preferred_variants(self, pkgname):
@@ -202,15 +208,14 @@ class PreferredPackages(object):
            respectively less-than, equal-to, or greater-than variant b of
            pkgname. One variant is less-than another if it is preferred over
            the other."""
-        return self._component_compare(pkgname, 'variant', a, b, False, None)
+        return self._component_compare(pkgname, 'variant', a, b, None)
 
     def architecture_compare(self, pkgname, a, b):
         """Return less-than-0, 0, or greater than 0 if architecture a of pkgname
            is respectively less-than, equal-to, or greater-than architecture b
            of pkgname. One architecture is less-than another if it is preferred
            over the other."""
-        return self._component_compare(pkgname, 'architecture', a, b,
-                                       False, None)
+        return self._component_compare(pkgname, 'architecture', a, b, None)
 
     def compiler_compare(self, pkgname, a, b):
         """Return less-than-0, 0, or greater than 0 if compiler a of pkgname is

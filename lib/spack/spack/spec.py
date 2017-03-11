@@ -2719,41 +2719,6 @@ class Spec(object):
     def dep_string(self):
         return ''.join("^" + dep.format() for dep in self.sorted_deps())
 
-    def __cmp__(self, other):
-        from package_prefs import pkgsort
-
-        # Package name sort order is not configurable, always goes alphabetical
-        if self.name != other.name:
-            return cmp(self.name, other.name)
-
-        # Package version is second in compare order
-        pkgname = self.name
-        if self.versions != other.versions:
-            return pkgsort().version_compare(
-                pkgname, self.versions, other.versions)
-
-        # Compiler is third
-        if self.compiler != other.compiler:
-            return pkgsort().compiler_compare(
-                pkgname, self.compiler, other.compiler)
-
-        # Variants
-        if self.variants != other.variants:
-            return pkgsort().variant_compare(
-                pkgname, self.variants, other.variants)
-
-        # Target
-        if self.architecture != other.architecture:
-            return pkgsort().architecture_compare(
-                pkgname, self.architecture, other.architecture)
-
-        # Dependency is not configurable
-        if self._dependencies != other._dependencies:
-            return -1 if self._dependencies < other._dependencies else 1
-
-        # Equal specs
-        return 0
-
     def __str__(self):
         ret = self.format() + self.dep_string()
         return ret.strip()

@@ -48,12 +48,10 @@ from spack.package_prefs import *
 
 
 class DefaultConcretizer(object):
-
     """This class doesn't have any state, it just provides some methods for
        concretization.  You can subclass it to override just some of the
        default concretization strategies, or you can override all of them.
     """
-
     def _valid_virtuals_and_externals(self, spec):
         """Returns a list of candidate virtual dep providers and external
            packages that coiuld be used to concretize a spec."""
@@ -113,6 +111,9 @@ class DefaultConcretizer(object):
                 return cmp(a.external, b.external)
 
         usable.sort(cmp=cmp_externals)
+
+
+
         return usable
 
     # XXX(deptypes): Look here.
@@ -329,10 +330,9 @@ class DefaultConcretizer(object):
                     spec.compiler, spec.architecture)
             return False
 
-        # Find the another spec that has a compiler, or the root if none do
+        # Find another spec that has a compiler, or the root if none do
         other_spec = spec if spec.compiler else find_spec(
             spec, lambda x: x.compiler)
-
         if not other_spec:
             other_spec = spec.root
         other_compiler = other_spec.compiler
@@ -346,6 +346,7 @@ class DefaultConcretizer(object):
                     spec.compiler, spec.architecture)
             return True
 
+
         # Filter the compilers into a sorted list based on the compiler_order
         # from spackconfig
         compiler_list = all_compiler_specs if not other_compiler else \
@@ -353,9 +354,14 @@ class DefaultConcretizer(object):
         if not compiler_list:
             # No compiler with a satisfactory spec was found
             raise UnavailableCompilerVersionError(other_compiler)
-        cmp_compilers = partial(
-            pkgsort().compiler_compare, other_spec.name)
-        matches = sorted(compiler_list, cmp=cmp_compilers)
+
+        # Use the order defined for our reference spec.
+        order = [spack.spec.CompilerSpec(s) for s in
+                 pkgsort().order_for_package(other_spec.name, 'compiler')]
+        def okey(c):
+            return next((i for i, oc in enumerate(order) if c.satisfies(oc)),
+                        len(order))
+        matches = sorted(compiler_list, key=okey)
 
         # copy concrete version into other_compiler
         try:
@@ -466,7 +472,7 @@ def _compiler_concretization_failure(compiler_spec, arch):
 class NoCompilersForArchError(spack.error.SpackError):
     def __init__(self, arch, available_os_targets):
         err_msg = ("No compilers found"
-                   " for operating system %s and target %s." 
+                   " for operating system %s and target %s."
                    "\nIf previous installations have succeeded, the"
                    " operating system may have been updated." %
                    (arch.platform_os, arch.target))
@@ -485,7 +491,6 @@ class NoCompilersForArchError(spack.error.SpackError):
 
 
 class UnavailableCompilerVersionError(spack.error.SpackError):
-
     """Raised when there is no available compiler that satisfies a
        compiler spec."""
 
@@ -500,7 +505,6 @@ class UnavailableCompilerVersionError(spack.error.SpackError):
 
 
 class NoValidVersionError(spack.error.SpackError):
-
     """Raised when there is no way to have a concrete version for a
        particular spec."""
 
