@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import platform
 import requests
 import glob
 import argparse
@@ -17,6 +18,8 @@ from jsonschema import Draft4Validator, validators
 from spack.error import SpackError
 import re
 import sys
+#import traceback
+
 
 description = "Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."
 
@@ -149,7 +152,6 @@ def test_suite(parser, args):
         except MarkedYAMLError as e:
             raise ConfigFileError(
                 "Error parsing yaml%s: %s" % (str(e.context_mark), e.problem))
-
         except IOError as e:
             raise ConfigFileError(
                 "Error reading configuration file %s: %s" % (filename, str(e)))
@@ -200,10 +202,16 @@ def test_suite(parser, args):
             tty.msg(spack.store.db.query(spec))
         #uninstall all packages before installing. This will reduce the number of skipped package installs.
         while (len(spack.store.db.query(spec)) > 0):
-            spec.concretize()
-            tty.msg("uninstalling " + str(spec))
-            pkg = spack.repo.get(spec)
-            pkg.do_uninstall()
+            try:
+                spec.concretize()
+                tty.msg("uninstalling " + str(spec))
+                pkg = spack.repo.get(spec)
+                pkg.do_uninstall()
+            except Exception as ex:
+                template = "An exception of type {0} occured. Arguments:\n{1!r}"
+                message = template.format(type(ex).__name__, ex.args)
+                tty.msg(message)
+                pass
         #concretize, failing can occur if the package uses the wrong compiler which would produce a failure for cdash
         try:
             spec.concretize()
@@ -217,7 +225,7 @@ def test_suite(parser, args):
             template = "An exception of type {0} occured. Arguments:\n{1!r}"
             message = template.format(type(ex).__name__, ex.args)
             tty.msg(message)
-
+            pass
     #Path contains xml files produced during the test run.
     if path is "": # if no path given in test yaml file. Uses default location.
         path = spack.prefix+cdash_root
