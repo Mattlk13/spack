@@ -18,10 +18,11 @@ from jsonschema import Draft4Validator, validators
 from spack.error import SpackError
 import re
 import sys
-#import traceback
+import traceback
 
 
 description = "Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."
+concreteTests = []
 
 def setup_parser(subparser):
     subparser.add_argument(
@@ -88,6 +89,39 @@ def extend_with_default(validator_class):
 
 DefaultSettingValidator = extend_with_default(Draft4Validator)
 
+def uninstallSpec(spec):
+    try:
+        spec.concretize()
+        tty.msg("uninstalling " + str(spec))
+        pkg = spack.repo.get(spec)
+        pkg.do_uninstall()
+    except Exception as ex:
+        template = "An exception of type {0} occured. Arguments:\n{1!r} uninstall"
+        message = template.format(type(ex).__name__, ex.args)
+        tty.msg(message)
+        pass
+    return spec
+
+def installSpec(spec,cdash,test):
+    failure = False
+    try:
+        #spec.concretize()
+        concreteTests.append(spec.to_yaml())
+        parser = argparse.ArgumentParser()
+        install.setup_parser(parser)
+        args = parser.parse_args([cdash]) #use cdash-complete if you want configure, build and test output.
+        args.command = "install"
+        args.package.append(test)
+        tty.msg(type(parser))
+        tty.msg(type(args))
+        install.install(parser, args)
+    except Exception as ex:
+        template = "An exception of type {0} occured. Arguments:\n{1!r} install"
+        message = template.format(type(ex).__name__, ex.args)
+        tty.msg(message)
+        failure = True
+        pass
+    return spec,failure
 
 def validate_section(data, schema):
     """Validate data read in from a Spack YAML file.
@@ -194,38 +228,21 @@ def test_suite(parser, args):
                     removeTests.append(test)
         for test in removeTests:
             tests.remove(test)
-    concreteTests = []
+    
     #setting up tests for contretizing
     for test in tests:
         spec = Spec(test)
+        tty.msg(spec)
         if len(spack.store.db.query(spec)) != 0:
             tty.msg(spack.store.db.query(spec))
         #uninstall all packages before installing. This will reduce the number of skipped package installs.
         while (len(spack.store.db.query(spec)) > 0):
-            try:
-                spec.concretize()
-                tty.msg("uninstalling " + str(spec))
-                pkg = spack.repo.get(spec)
-                pkg.do_uninstall()
-            except Exception as ex:
-                template = "An exception of type {0} occured. Arguments:\n{1!r}"
-                message = template.format(type(ex).__name__, ex.args)
-                tty.msg(message)
-                pass
-        #concretize, failing can occur if the package uses the wrong compiler which would produce a failure for cdash
-        try:
-            spec.concretize()
-            concreteTests.append(spec.to_yaml())
-            parser = argparse.ArgumentParser()
-            install.setup_parser(parser)
-            args = parser.parse_args([cdash]) #use cdash-complete if you want configure, build and test output.
-            args.package = test
-            install.install(parser, args)
-        except Exception as ex:
-            template = "An exception of type {0} occured. Arguments:\n{1!r}"
-            message = template.format(type(ex).__name__, ex.args)
-            tty.msg(message)
-            pass
+            spec = uninstallSpec(spec)
+        spec,failure = installSpec(spec,cdash,test)
+        if not failure:
+            tty.msg("Failure did not occur, uninstalling " + str(spec))
+            uninstallSpec(spec)
+     #sending out cdash data created during the test
     #Path contains xml files produced during the test run.
     if path is "": # if no path given in test yaml file. Uses default location.
         path = spack.prefix+cdash_root
