@@ -20,7 +20,6 @@ from spack.error import SpackError
 import re
 import sys
 import time
-import logging
 import traceback
 concreteTests = []
 
@@ -154,11 +153,6 @@ def readFile():
         return lines
 
 def test_suite(parser, args):
-    logFile = "spackTiming.log"
-    fContents = readFile()
-    
-
-    logging.basicConfig(filename = logFile, level=logging.DEBUG,filemode='a+', format='%(asctime)s - %(levelname)s - %(message)s')
     #pdb.set_trace()
     """Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."""
     if not args.yamlFile:
@@ -280,7 +274,6 @@ def test_suite(parser, args):
                                     mydata = fh.read() #using a put request to send xml files to cdash.
                                     response = requests.put(dashboard,
                                             data=mydata,
-                                            verify=False,
                                             headers={'content-type':'text/plain'},
                                             params={'file': path+file}
                                             )
