@@ -141,7 +141,7 @@ def install(parser, args, **kwargs):
             package = spack.repo.get(spec)
             kwargs['explicit'] = True
             package.do_install(**kwargs)
-    except OutofSpaceError as err:
+    except Exception as err:
         raise
     # Dump log file if asked to
     if args.log_format is not None:
