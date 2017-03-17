@@ -147,11 +147,6 @@ def installSpec(spec,cdash,test):
         pass
     return spec,failure
 
-def readFile():
-    with open('spackTiming.log') as f:
-        lines = f.read().splitlines()
-        return lines
-
 def test_suite(parser, args):
     #pdb.set_trace()
     """Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."""
