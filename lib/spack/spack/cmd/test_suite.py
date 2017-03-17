@@ -23,6 +23,7 @@ import time
 import traceback
 concreteTests = []
 
+
 description = "Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."
 
 def setup_parser(subparser):
@@ -131,8 +132,6 @@ def installSpec(spec,cdash,test):
         args.no_checksum = True
         args.package.append(test)
         install.install(parser, args)
-    except OutofSpaceError as err:
-        raise
     except Exception as ex:
         template = "An exception of type {0} occured. Arguments:\n{1!r} install"
         message = template.format(type(ex).__name__, ex.args)
@@ -252,11 +251,7 @@ def test_suite(parser, args):
             spec,exception = uninstallSpec(spec)
             if exception is "PackageStillNeededError":
                 break
-        try:
-            spec,failure = installSpec(spec,cdash,test)
-        except OutofSpaceError as err:
-            sys.exit(1)
-
+        spec,failure = installSpec(spec,cdash,test)
         if not failure:
             tty.msg("Failure did not occur, uninstalling " + str(spec))
             spec,exception = uninstallSpec(spec)
@@ -286,8 +281,6 @@ class ConfigError(SpackError):
 class ConfigFileError(ConfigError):
     pass
 
-class OutofSpaceError(SpackError):
-    """Raised when no more disk space is available."""
     
 class ConfigFormatError(ConfigError):
     """Raised when a configuration format does not match its schema."""

@@ -691,7 +691,7 @@ class StageError(spack.error.SpackError):
 class RestageError(StageError):
     """"Error encountered during restaging."""
 
-class OutofSpaceError(StageError):
+class OutofSpaceError(spack.error.SpackError):
     """Raised when no more disk space is available."""
 
 class ChdirError(StageError):
