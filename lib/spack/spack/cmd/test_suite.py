@@ -22,7 +22,6 @@ import sys
 import time
 import traceback
 concreteTests = []
-import stage
 
 description = "Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."
 
@@ -287,6 +286,8 @@ class ConfigError(SpackError):
 class ConfigFileError(ConfigError):
     pass
 
+class OutofSpaceError(SpackError):
+    """Raised when no more disk space is available."""
     
 class ConfigFormatError(ConfigError):
     """Raised when a configuration format does not match its schema."""
