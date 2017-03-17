@@ -518,7 +518,7 @@ class Stage(object):
                     if err.errno == errno.EEXIST and os.path.isdir(tmp_dir):
                         pass
                     else:
-                        raise OutofSpaceError("Out of disk space:", str(e))
+                        raise OutofSpaceError("Out of disk space:", str(err))
                 tty.debug('link %s -> %s' % (self.path, tmp_dir))
                 os.symlink(tmp_dir, self.path)
             else:
