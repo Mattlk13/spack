@@ -128,6 +128,7 @@ def install(parser, args, **kwargs):
             spec, test_suite
         )(PackageBase.do_install)
 
+    
     # Do the actual installation
     if args.things_to_install == 'dependencies':
         # Install dependencies as-if they were installed
@@ -144,4 +145,5 @@ def install(parser, args, **kwargs):
     # Dump log file if asked to
     if args.log_format is not None:
         test_suite.dump()
+
 
