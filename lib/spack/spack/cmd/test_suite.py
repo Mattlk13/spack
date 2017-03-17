@@ -249,10 +249,10 @@ def test_suite(parser, args):
         if len(spack.store.db.query(spec)) != 0:
             tty.msg(spack.store.db.query(spec))
         #uninstall all packages before installing. This will reduce the number of skipped package installs.
-        while (len(spack.store.db.query(spec)) > 0):
+        if (len(spack.store.db.query(spec)) > 0):
             spec,exception = uninstallSpec(spec)
             if exception is "PackageStillNeededError":
-                break
+                continue
         try:
             spec,failure = installSpec(spec,cdash,test)
         except:
@@ -261,8 +261,6 @@ def test_suite(parser, args):
         if not failure:
             tty.msg("Failure did not occur, uninstalling " + str(spec))
             spec,exception = uninstallSpec(spec)
-            if exception is "PackageStillNeededError":
-                break
     #Path contains xml files produced during the test run.
     if path is "": # if no path given in test yaml file. Uses default location.
         path = spack.prefix+cdash_root
