@@ -128,20 +128,21 @@ def install(parser, args, **kwargs):
             spec, test_suite
         )(PackageBase.do_install)
 
-    
-    # Do the actual installation
-    if args.things_to_install == 'dependencies':
-        # Install dependencies as-if they were installed
-        # for root (explicit=False in the DB)
-        kwargs['explicit'] = False
-        for s in spec.dependencies():
-            p = spack.repo.get(s)
-            p.do_install(**kwargs)
-    else:
-        package = spack.repo.get(spec)
-        kwargs['explicit'] = True
-        package.do_install(**kwargs)
-
+    try:
+        # Do the actual installation
+        if args.things_to_install == 'dependencies':
+            # Install dependencies as-if they were installed
+            # for root (explicit=False in the DB)
+            kwargs['explicit'] = False
+            for s in spec.dependencies():
+                p = spack.repo.get(s)
+                p.do_install(**kwargs)
+        else:
+            package = spack.repo.get(spec)
+            kwargs['explicit'] = True
+            package.do_install(**kwargs)
+    except OutofSpaceError as err:
+        raise
     # Dump log file if asked to
     if args.log_format is not None:
         test_suite.dump()
