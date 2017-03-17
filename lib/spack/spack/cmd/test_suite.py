@@ -22,7 +22,7 @@ import sys
 import time
 import traceback
 concreteTests = []
-
+import stage
 
 description = "Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."
 
