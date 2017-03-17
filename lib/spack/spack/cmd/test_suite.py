@@ -3,6 +3,7 @@
 import os
 import platform
 import requests
+import spack.package
 import glob
 import argparse
 import llnl.util.tty as tty
@@ -18,11 +19,13 @@ from jsonschema import Draft4Validator, validators
 from spack.error import SpackError
 import re
 import sys
+import time
+import logging
 import traceback
+concreteTests = []
 
 
 description = "Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."
-concreteTests = []
 
 def setup_parser(subparser):
     subparser.add_argument(
@@ -89,39 +92,6 @@ def extend_with_default(validator_class):
 
 DefaultSettingValidator = extend_with_default(Draft4Validator)
 
-def uninstallSpec(spec):
-    try:
-        spec.concretize()
-        tty.msg("uninstalling " + str(spec))
-        pkg = spack.repo.get(spec)
-        pkg.do_uninstall()
-    except Exception as ex:
-        template = "An exception of type {0} occured. Arguments:\n{1!r} uninstall"
-        message = template.format(type(ex).__name__, ex.args)
-        tty.msg(message)
-        pass
-    return spec
-
-def installSpec(spec,cdash,test):
-    failure = False
-    try:
-        #spec.concretize()
-        concreteTests.append(spec.to_yaml())
-        parser = argparse.ArgumentParser()
-        install.setup_parser(parser)
-        args = parser.parse_args([cdash]) #use cdash-complete if you want configure, build and test output.
-        args.command = "install"
-        args.package.append(test)
-        tty.msg(type(parser))
-        tty.msg(type(args))
-        install.install(parser, args)
-    except Exception as ex:
-        template = "An exception of type {0} occured. Arguments:\n{1!r} install"
-        message = template.format(type(ex).__name__, ex.args)
-        tty.msg(message)
-        failure = True
-        pass
-    return spec,failure
 
 def validate_section(data, schema):
     """Validate data read in from a Spack YAML file.
@@ -135,7 +105,60 @@ def validate_section(data, schema):
     except jsonschema.ValidationError as e:
         raise ConfigFormatError(e, data)
 
+def uninstallSpec(spec):
+    try:
+        spec.concretize()
+        tty.msg("uninstalling... " + str(spec))
+        pkg = spack.repo.get(spec)
+        pkg.do_uninstall()
+    except Exception as ex:
+        template = "An exception of type {0} occured. Arguments:\n{1!r} uninstall"
+        message = template.format(type(ex).__name__, ex.args)
+        tty.msg(message)
+        pass
+    except PackageStillNeededError as e:
+        return spec, "PackageStillNeededError"
+    return spec, ""
+
+def installSpec(spec,cdash,test):
+    failure = False
+    try:
+        #spec.concretize()
+        tty.msg("installing... " + str(spec))
+        concreteTests.append(spec.to_yaml())
+        parser = argparse.ArgumentParser()
+        install.setup_parser(parser)
+        args = parser.parse_args([cdash]) #use cdash-complete if you want configure, build and test output.
+        args.command = "install"
+        args.no_checksum = True
+        args.package.append(test)
+        install.install(parser, args)
+    except Exception as ex:
+        template = "An exception of type {0} occured. Arguments:\n{1!r} install"
+        message = template.format(type(ex).__name__, ex.args)
+        tty.msg(message)
+        traceback.print_exc(file=sys.stdout)
+        exc_type, exc_value, exc_traceback = sys.exc_info()
+        print "*** print_tb:"
+        traceback.print_tb(exc_traceback, limit=1, file=sys.stdout)
+        print "*** print_exception:"
+        traceback.print_exception(exc_type, exc_value, exc_traceback,
+                              limit=2, file=sys.stdout)
+        failure = True
+        pass
+    return spec,failure
+
+def readFile():
+    with open('spackTiming.log') as f:
+        lines = f.read().splitlines()
+        return lines
+
 def test_suite(parser, args):
+    logFile = "spackTiming.log"
+    fContents = readFile()
+    
+
+    logging.basicConfig(filename = logFile, level=logging.DEBUG,filemode='a+', format='%(asctime)s - %(levelname)s - %(message)s')
     #pdb.set_trace()
     """Compiles a list of tests from a yaml file. Runs Spec and concretize then produces cdash format."""
     if not args.yamlFile:
@@ -228,7 +251,6 @@ def test_suite(parser, args):
                     removeTests.append(test)
         for test in removeTests:
             tests.remove(test)
-    
     #setting up tests for contretizing
     for test in tests:
         spec = Spec(test)
@@ -237,12 +259,15 @@ def test_suite(parser, args):
             tty.msg(spack.store.db.query(spec))
         #uninstall all packages before installing. This will reduce the number of skipped package installs.
         while (len(spack.store.db.query(spec)) > 0):
-            spec = uninstallSpec(spec)
+            spec,exception = uninstallSpec(spec)
+            if exception is "PackageStillNeededError":
+                break
         spec,failure = installSpec(spec,cdash,test)
         if not failure:
             tty.msg("Failure did not occur, uninstalling " + str(spec))
-            uninstallSpec(spec)
-     #sending out cdash data created during the test
+            spec,exception = uninstallSpec(spec)
+            if exception is "PackageStillNeededError":
+                break
     #Path contains xml files produced during the test run.
     if path is "": # if no path given in test yaml file. Uses default location.
         path = spack.prefix+cdash_root
@@ -255,6 +280,7 @@ def test_suite(parser, args):
                                     mydata = fh.read() #using a put request to send xml files to cdash.
                                     response = requests.put(dashboard,
                                             data=mydata,
+                                            verify=False,
                                             headers={'content-type':'text/plain'},
                                             params={'file': path+file}
                                             )
