@@ -99,6 +99,11 @@ class Python(Package):
             r'\1setup.py\2 --no-user-cfg \3\6'
         )
 
+    @when('@:2.6,3.0:3.3')
+    def patch(self):
+        # See https://github.com/LLNL/spack/issues/1490
+        pass
+
     def install(self, spec, prefix):
         # TODO: The '--no-user-cfg' option for Python installation is only in
         # Python v2.7 and v3.4+ (see https://bugs.python.org/issue1180) and
@@ -142,6 +147,16 @@ class Python(Package):
         configure(*config_args)
         make()
         make('install')
+
+        self.sysconfigfilename = '_sysconfigdata.py'
+        if spec.satisfies('@3.6:'):
+            # Python 3.6.0 renamed the sys config file
+            python3 = os.path.join(prefix.bin,
+                                   'python{0}'.format(self.version.up_to(1)))
+            python = Executable(python3)
+            sc = 'import sysconfig; print(sysconfig._get_sysconfigdata_name())'
+            cf = python('-c', sc, output=str).strip('\n')
+            self.sysconfigfilename = '{0}.py'.format(cf)
 
         self._save_distutil_vars(prefix)
 
@@ -202,12 +217,11 @@ class Python(Package):
         input_filename = None
         for filename in [join_path(lib_dir,
                                    'python{0}'.format(self.version.up_to(2)),
-                                   '_sysconfigdata.py')
+                                   self.sysconfigfilename)
                          for lib_dir in [prefix.lib, prefix.lib64]]:
             if os.path.isfile(filename):
                 input_filename = filename
                 break
-
         if not input_filename:
             return
 
@@ -296,7 +310,7 @@ class Python(Package):
         config_dirname = 'config-{0}m'.format(
             self.version.up_to(2)) if self.spec.satisfies('@3:') else 'config'
 
-        rel_filenames = ['_sysconfigdata.py',
+        rel_filenames = [self.sysconfigfilename,
                          join_path(config_dirname, 'Makefile')]
 
         abs_filenames = [join_path(dirname, filename) for dirname in
@@ -321,7 +335,7 @@ class Python(Package):
     def site_packages_dir(self):
         return join_path(self.python_lib_dir, 'site-packages')
 
-    def setup_dependent_environment(self, spack_env, run_env, extension_spec):
+    def setup_dependent_environment(self, spack_env, run_env, dependent_spec):
         """Set PYTHONPATH to include site-packages dir for the
         extension and any other python extensions it depends on."""
         # The python executable for version 3 may be python3 or python
@@ -347,7 +361,7 @@ class Python(Package):
         spack_env.set('PYTHONHOME', prefix.strip('\n'))
 
         python_paths = []
-        for d in extension_spec.traverse(
+        for d in dependent_spec.traverse(
                 deptype=('build', 'run'), deptype_query='run'):
             if d.package.extends(self.spec):
                 python_paths.append(join_path(d.prefix,
@@ -357,12 +371,12 @@ class Python(Package):
         spack_env.set('PYTHONPATH', pythonpath)
 
         # For run time environment set only the path for
-        # extension_spec and prepend it to PYTHONPATH
-        if extension_spec.package.extends(self.spec):
+        # dependent_spec and prepend it to PYTHONPATH
+        if dependent_spec.package.extends(self.spec):
             run_env.prepend_path('PYTHONPATH', join_path(
-                extension_spec.prefix, self.site_packages_dir))
+                dependent_spec.prefix, self.site_packages_dir))
 
-    def setup_dependent_package(self, module, ext_spec):
+    def setup_dependent_package(self, module, dependent_spec):
         """Called before python modules' install() methods.
 
         In most cases, extensions will only need to have one line::
@@ -373,6 +387,7 @@ class Python(Package):
             'python{0}'.format('3' if self.spec.satisfies('@3') else '')
         )
 
+        module.python_exe = python_path
         module.python = Executable(python_path)
         module.setup_py = Executable(python_path + ' setup.py --no-user-cfg')
 
@@ -383,15 +398,15 @@ class Python(Package):
                 module.setup_py.add_default_env(key, value)
 
         # Add variables for lib/pythonX.Y and lib/pythonX.Y/site-packages dirs.
-        module.python_lib_dir = join_path(ext_spec.prefix,
+        module.python_lib_dir = join_path(dependent_spec.prefix,
                                           self.python_lib_dir)
-        module.python_include_dir = join_path(ext_spec.prefix,
+        module.python_include_dir = join_path(dependent_spec.prefix,
                                               self.python_include_dir)
-        module.site_packages_dir = join_path(ext_spec.prefix,
+        module.site_packages_dir = join_path(dependent_spec.prefix,
                                              self.site_packages_dir)
 
         # Make the site packages directory for extensions
-        if ext_spec.package.is_extension:
+        if dependent_spec.package.is_extension:
             mkdirp(module.site_packages_dir)
 
     # ========================================================================

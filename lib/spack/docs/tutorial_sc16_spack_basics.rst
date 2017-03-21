@@ -184,15 +184,15 @@ compilers.
   [+] ~/spack/opt/spack/linux-redhat6-x86_64/intel-15.0.4/libelf-0.8.13-w33hrejdyqu2j2gggdswitls2zv6kdsi
 
 
-The spec syntax also includes compiler flags. Spack accepts ``cppflags``,
-``cflags``, ``cxxflags``, ``fflags``, ``ldflags``, and ``ldlibs``
-parameters.  The values of these fields must be escape-quoted with ``\"``
-on the command line. These values are injected into the compile line
-automatically by the Spack compiler wrappers.
+The spec syntax also includes compiler flags. Spack accepts
+``cppflags``, ``cflags``, ``cxxflags``, ``fflags``, ``ldflags``, and
+``ldlibs`` parameters.  The values of these fields must be quoted on
+the command line if they include spaces. These values are injected
+into the compile line automatically by the Spack compiler wrappers.
 
 .. code-block:: console
 
-  $ spack install libelf @0.8.12 cppflags=\"-O3\"
+  $ spack install libelf @0.8.12 cppflags="-O3"
   ==> Installing libelf
   ==> Trying to fetch from ~/spack/var/spack/cache/libelf/libelf-0.8.12.tar.gz
   ################################################################################################################################################################################# 100.0%
@@ -309,7 +309,7 @@ top-level package, we can also specify about a dependency using ``^``.
 
 Packages can also be referred to from the command line by their package
 hash. Using the ``spack find -lf`` command earlier we saw that the hash
-of our optimized installation of libelf (``cppflags=\"-O3\"``) began with
+of our optimized installation of libelf (``cppflags="-O3"``) began with
 ``vrv2ttb``. We can now explicitly build with that package without typing
 the entire spec, by using the ``/`` sigil to refer to it by hash. As with
 other tools like git, you do not need to specify an *entire* hash on the
@@ -1006,8 +1006,7 @@ We can uninstall packages by spec using the same syntax as install.
   w33hrej libelf@0.8.13%intel
 
 
-  ==> Do you want to proceed ? [y/n]
-  y
+  ==> Do you want to proceed? [y/n] y
   ==> Successfully uninstalled libelf@0.8.13%intel@15.0.4 arch=linux-redhat6-x86_64-w33hrej
 
 
@@ -1054,8 +1053,7 @@ remove packages that are required by another installed package.
   4blbe3q libelf@0.8.12%intel
 
 
-  ==> Do you want to proceed ? [y/n]
-  y
+  ==> Do you want to proceed? [y/n] y
   ==> Successfully uninstalled libdwarf@20160507%intel@16.0.3 arch=linux-redhat6-x86_64-csruprg
   ==> Successfully uninstalled libelf@0.8.12%intel@16.0.3 arch=linux-redhat6-x86_64-4blbe3q
 
@@ -1088,8 +1086,7 @@ packages at once.
   ffwrpxn trilinos@12.8.1%gcc+boost~debug+hdf5+hypre+metis+mumps~python+shared+suite-sparse+superlu-dist
 
 
-  ==> Do you want to proceed ? [y/n]
-  y
+  ==> Do you want to proceed? [y/n] y
   ==> Successfully uninstalled trilinos@12.8.1%gcc@4.4.7+boost~debug+hdf5+hypre+metis+mumps~python+shared+suite-sparse+superlu-dist arch=linux-redhat6-x86_64-ffwrpxn
 
 -----------------------------
@@ -1103,8 +1100,8 @@ already covered in the :ref:`basics-tutorial-install` and
 The ``spack find`` command can accept what we call "anonymous specs."
 These are expressions in spec syntax that do not contain a package
 name. For example, `spack find %intel` will return every package built
-with the intel compiler, and ``spack find cppflags=\\"-O3\\"`` will
-return every package which was built with ``cppflags=\\"-O3\\"``.
+with the intel compiler, and ``spack find cppflags="-O3"`` will
+return every package which was built with ``cppflags="-O3"``.
 
 .. code-block:: console
 
@@ -1115,7 +1112,7 @@ return every package which was built with ``cppflags=\\"-O3\\"``.
 
 
 
-  $ spack find cppflags=\"-O3\"
+  $ spack find cppflags="-O3"
   ==> 1 installed packages.
   -- linux-redhat6-x86_64 / gcc@4.4.7 -----------------------------
   libelf@0.8.12
