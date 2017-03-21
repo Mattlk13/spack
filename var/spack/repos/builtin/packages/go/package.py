@@ -56,6 +56,7 @@ class Go(Package):
 
     extendable = True
 
+    version('1.8',   '7743960c968760437b6e39093cfe6f67')
     version('1.7.5', '506de2d870409e9003e1440bcfeb3a65')
     version('1.7.4', '49c1076428a5d3b5ad7ac65233fcca2f')
     version('1.6.4', 'b023240be707b34059d2c114d3465c92')
@@ -113,7 +114,7 @@ class Go(Package):
     def setup_environment(self, spack_env, run_env):
         spack_env.set('GOROOT_FINAL', self.spec.prefix)
 
-    def setup_dependent_package(self, module, ext_spec):
+    def setup_dependent_package(self, module, dependent_spec):
         """Called before go modules' install() methods.
 
         In most cases, extensions will only need to set GOPATH and use go::
@@ -126,13 +127,13 @@ class Go(Package):
         #  Add a go command/compiler for extensions
         module.go = Executable(join_path(self.spec.prefix.bin, 'go'))
 
-    def setup_dependent_environment(self, spack_env, run_env, ext_spec):
+    def setup_dependent_environment(self, spack_env, run_env, dependent_spec):
         if os.environ.get('GOROOT', False):
             tty.warn('GOROOT is set, this is not recommended')
 
         path_components = []
         # Set GOPATH to include paths of dependencies
-        for d in ext_spec.traverse():
+        for d in dependent_spec.traverse():
             if d.package.extends(self.spec):
                 path_components.append(d.prefix)
 
@@ -141,4 +142,4 @@ class Go(Package):
 
         # Allow packages to find this when using module or dotkit
         run_env.prepend_path('GOPATH', ':'.join(
-            [ext_spec.prefix] + path_components))
+            [dependent_spec.prefix] + path_components))
